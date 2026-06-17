@@ -266,6 +266,7 @@
   }
   .gallery-card-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
   .gallery-card-rr { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+  .gallery-card-duration { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
   .gallery-card-link {
     font-size: 11px;
     font-weight: 600;
@@ -365,6 +366,23 @@
     text-transform: uppercase;
     border-bottom: 1px solid var(--border);
     white-space: nowrap;
+  }
+  .trade-table th.sortable-th {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s, background 0.15s;
+  }
+  .trade-table th.sortable-th:hover {
+    color: var(--gold);
+    background: var(--surface3, #20242F);
+  }
+  .trade-table th.sort-active { color: var(--gold); }
+  .sort-arrow {
+    display: inline-block;
+    margin-left: 3px;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0;
   }
 
   .trade-table td {
@@ -1263,16 +1281,6 @@
     </div>
   </div>
 
-  <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px 0 0;overflow:hidden">
-    <span style="font-size:12px;color:var(--muted);white-space:nowrap;padding:7px 10px;background:var(--surface2);border-right:1px solid var(--border)">Order by</span>
-    <select id="sortKey" onchange="renderCards()" style="padding:7px 6px;background:var(--surface);border:none;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;cursor:pointer">
-      <option value="tradeNo">Trade No.</option>
-      <option value="date">วันที่สร้าง</option>
-    </select>
-    <div style="width:1px;height:16px;background:var(--border)"></div>
-    <button id="sortDirBtn" onclick="toggleSortDir()" title="สลับ asc/desc" style="padding:0;background:transparent;border:none;color:var(--muted);font-size:12px;font-family:var(--font-mono);cursor:pointer;white-space:nowrap;transition:color 0.15s;padding:7px 4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↑ ASC</button>
-  </div>
-
   <button class="btn" onclick="removeAllTrades()" style="color:var(--red);border-color:var(--red);opacity:0.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">
     <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 16 16"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2M5 5l.8 9h4.4L11 5"/></svg>
     ลบทั้งหมด
@@ -1289,15 +1297,15 @@
   <thead>
     <tr>
       <th class="pc-img-col">PC IMAGE</th>
-      <th>Trade No.</th>
-      <th>Status</th>
-      <th>Date</th>
-      <th>Session</th>
+      <th class="sortable-th" onclick="sortBy('tradeNo')">Trade No. <span class="sort-arrow" id="sortArrow-tradeNo"></span></th>
+      <th class="sortable-th" onclick="sortBy('status')">Status <span class="sort-arrow" id="sortArrow-status"></span></th>
+      <th class="sortable-th" onclick="sortBy('tradeDate')">Date <span class="sort-arrow" id="sortArrow-tradeDate"></span></th>
+      <th class="sortable-th" onclick="sortBy('session')">Session <span class="sort-arrow" id="sortArrow-session"></span></th>
       <th>Tags</th>
       <th>Before</th>
       <th>After</th>
-      <th>RR</th>
-      <th>Duration</th>
+      <th class="sortable-th" onclick="sortBy('rr')">RR <span class="sort-arrow" id="sortArrow-rr"></span></th>
+      <th class="sortable-th" onclick="sortBy('duration')">Duration <span class="sort-arrow" id="sortArrow-duration"></span></th>
       <th>Note</th>
       <th></th>
     </tr>
@@ -1550,7 +1558,29 @@ const SVG = {
 
 let trades = [];
 let editId = null;
+let sortKey = 'tradeNo';
 let sortDir = 'asc';
+
+function sortBy(key) {
+  if (sortKey === key) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey = key;
+    sortDir = 'asc';
+  }
+  updateSortArrows();
+  renderCards();
+}
+
+function updateSortArrows() {
+  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
+  document.querySelectorAll('.sortable-th').forEach(el => el.classList.remove('sort-active'));
+  const arrowEl = document.getElementById('sortArrow-' + sortKey);
+  if (arrowEl) {
+    arrowEl.textContent = sortDir === 'asc' ? '↑' : '↓';
+    arrowEl.closest('.sortable-th')?.classList.add('sort-active');
+  }
+}
 let statusFilter = null;
 let tagFilter = null;
 
@@ -1675,12 +1705,6 @@ document.addEventListener('click', e => {
   const wrap = document.getElementById('tagFilterWrap');
   if (wrap && !wrap.contains(e.target)) closeTagFilterDropdown();
 });
-
-function toggleSortDir() {
-  sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-  document.getElementById('sortDirBtn').textContent = sortDir === 'asc' ? '↑ ASC' : '↓ DESC';
-  renderCards();
-}
 
 // ── Save (online) ──
 async function saveTrade() {
@@ -1830,12 +1854,23 @@ function updateStats() {
 // ── Render table ──
 function renderCards() {
   const grid = document.getElementById('cardGrid');
-  const key = document.getElementById('sortKey').value;
   const filtered = getFilteredTrades()
     .slice()
     .sort((a, b) => {
-      let va = key === 'tradeNo' ? (parseInt(a.tradeNo) || a.tradeNo) : (a.id || '');
-      let vb = key === 'tradeNo' ? (parseInt(b.tradeNo) || b.tradeNo) : (b.id || '');
+      let va, vb;
+      if (sortKey === 'tradeNo') {
+        va = parseInt(a.tradeNo); vb = parseInt(b.tradeNo);
+        if (isNaN(va)) va = a.tradeNo; if (isNaN(vb)) vb = b.tradeNo;
+      } else if (sortKey === 'rr' || sortKey === 'duration') {
+        va = (a[sortKey] === '' || a[sortKey] === undefined || a[sortKey] === null) ? -Infinity : parseFloat(a[sortKey]);
+        vb = (b[sortKey] === '' || b[sortKey] === undefined || b[sortKey] === null) ? -Infinity : parseFloat(b[sortKey]);
+      } else if (sortKey === 'tradeDate') {
+        va = a.tradeDate || a.date || '';
+        vb = b.tradeDate || b.date || '';
+      } else {
+        va = (a[sortKey] || '').toString().toLowerCase();
+        vb = (b[sortKey] || '').toString().toLowerCase();
+      }
       if (va < vb) return sortDir === 'asc' ? -1 : 1;
       if (va > vb) return sortDir === 'asc' ? 1 : -1;
       return 0;
@@ -2344,8 +2379,10 @@ function renderGalleryGroup(containerId, statusVal) {
         <div class="gallery-card-meta">
           <span class="trade-no"># ${t.tradeNo}</span>
           ${t.rr !== undefined && t.rr !== '' ? `<span class="gallery-card-rr" style="color:${parseFloat(t.rr) >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtRR(t.rr)}</span>` : ''}
+          ${t.duration !== undefined && t.duration !== '' ? `<span class="gallery-card-duration">⏱ ${fmtDuration(t.duration)}</span>` : ''}
         </div>
-        <a class="gallery-card-link" href="javascript:void(0)" onclick="editTrade('${t.id}')">✏️ แก้ไข Trade #${t.tradeNo}</a>
+        ${Array.isArray(t.tags) && t.tags.length ? `<div class="tag-cell-pills" style="margin-bottom:6px">${t.tags.map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>` : ''}
+        <a class="gallery-card-link" href="javascript:void(0)" onclick="editTrade('${t.id}')">→ ไปที่เทรด #${t.tradeNo}</a>
       </div>
     </div>
   `).join('');
@@ -2359,6 +2396,7 @@ function renderGallery() {
 // ── Init ──
 applyBanner();
 setStatusFilter(null);
+updateSortArrows();
 loadTrades();
 
 </script>
