@@ -78,14 +78,85 @@
     border-bottom: 1px solid var(--border);
     padding: 1.25rem 2rem;
     padding-right: 4rem;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
+    gap: 1.5rem;
     position: sticky;
     top: 0;
     background: var(--bg);
     z-index: 100;
   }
+
+  /* ── Goal block (centre of header) ── */
+  .header-goal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .goal-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .goal-counts {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .goal-counts:hover .goal-target { color: var(--gold); }
+  .goal-done {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .goal-sep { font-size: 16px; color: var(--muted); }
+  .goal-target {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--muted);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+  }
+  .goal-target svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+  .goal-bar-track {
+    width: 140px;
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--gold-dim, #8B6914), var(--gold));
+    transition: width 0.4s ease;
+  }
+  .goal-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .goal-remain-badge {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 1px 8px;
+    white-space: nowrap;
+  }
+  .goal-remain-badge.done { color: var(--green); border-color: var(--green); }
 
   .logo {
     display: flex;
@@ -1210,7 +1281,32 @@
     </div>
   </div>
 
+  <!-- ── Goal Block (centre) ── -->
+  <div class="header-goal">
+    <div class="goal-label">GOAL</div>
+    <div class="goal-progress-wrap">
+      <div class="goal-counts" onclick="openTargetModal()" title="แก้ไข Target">
+        <span class="goal-done" id="goalDone">0</span>
+        <span class="goal-sep">/</span>
+        <span class="goal-target">
+          <span id="goalTarget">—</span>
+          <svg viewBox="0 0 16 16"><path d="M11.5 2.5l2 2L5 13l-3 1 1-3Z"/></svg>
+        </span>
+      </div>
+      <div class="goal-bar-track">
+        <div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div>
+      </div>
+      <span class="goal-remain-badge" id="goalRemainBadge">— left</span>
+    </div>
+    <div class="goal-label" id="goalSubLabel" style="letter-spacing:0.05em;text-transform:none;font-size:11px;color:var(--muted)">trades to target</div>
+  </div>
+
+  <!-- ── Stats Bar (right) ── -->
   <div class="stats-bar" id="statsBar">
+    <div class="stat">
+      <div class="stat-val" id="statTotal">0</div>
+      <div class="stat-label">Total Trades</div>
+    </div>
     <div class="stat">
       <div class="stat-val" id="statWinrate" style="color:var(--gold)">—</div>
       <div class="stat-label">Winrate</div>
@@ -1224,23 +1320,24 @@
       <div class="stat-label">Con. Loss</div>
     </div>
     <div class="stat">
+      <div class="stat-val" id="statPF" style="color:var(--gold)">—</div>
+      <div class="stat-label">Profit Factor</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statMinRR" style="color:var(--green)">—</div>
+      <div class="stat-label">Min RR (Win)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statMaxRR" style="color:var(--green)">—</div>
+      <div class="stat-label">Max RR</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statTotalRR" style="color:var(--gold)">—</div>
+      <div class="stat-label">Total RR</div>
+    </div>
+    <div class="stat">
       <div class="stat-val" id="statAvgRR" style="color:var(--gold)">—</div>
       <div class="stat-label">Avg. RR</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statTotal">0</div>
-      <div class="stat-label">Total Trades</div>
-    </div>
-    <div class="stat" style="cursor:pointer;position:relative" onclick="openTargetModal()" title="แก้ไข Target">
-      <div style="display:flex;align-items:center;gap:5px">
-        <div class="stat-val" style="color:var(--gold)" id="statTarget">—</div>
-        <svg style="width:10px;height:10px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0" viewBox="0 0 16 16"><path d="M11.5 2.5l2 2L5 13l-3 1 1-3Z"/></svg>
-      </div>
-      <div class="stat-label">Target</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statRemain" style="color:var(--muted)">—</div>
-      <div class="stat-label">Remain</div>
     </div>
   </div>
 </header>
@@ -1264,7 +1361,7 @@
 
   <div class="search-wrap">
     <svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="9.5" y1="9.5" x2="14" y2="14"/></svg>
-    <input type="text" id="searchInput" placeholder="ค้นหา Trade No…" oninput="onFilterChange()" />
+    <input type="text" id="searchInput" placeholder="ค้นหาจาก Note…" oninput="onFilterChange()" />
   </div>
 
   <div style="display:flex;align-items:center;gap:6px">
@@ -1812,7 +1909,7 @@ async function removeAllTrades() {
 function getFilteredTrades() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   return trades
-    .filter(t => !q || t.tradeNo.toLowerCase().includes(q))
+    .filter(t => !q || (t.note || '').toLowerCase().includes(q))
     .filter(t => !statusFilter || t.status === statusFilter)
     .filter(t => !tagFilter || (Array.isArray(t.tags) && t.tags.includes(tagFilter)));
 }
@@ -1863,6 +1960,41 @@ function updateStats() {
   document.getElementById('statConLoss').textContent = conLoss;
 
   const rrValues = filtered.map(t => parseFloat(t.rr)).filter(v => !isNaN(v));
+  const winRRValues = filtered.filter(t => t.status === 'WIN').map(t => parseFloat(t.rr)).filter(v => !isNaN(v));
+
+  // Min RR จาก trade ที่ status = WIN เท่านั้น
+  const minEl = document.getElementById('statMinRR');
+  if (winRRValues.length > 0) {
+    const minRR = Math.min(...winRRValues);
+    minEl.textContent = (minRR >= 0 ? '+' : '') + minRR.toFixed(2);
+    minEl.style.color = minRR >= 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    minEl.textContent = '—';
+    minEl.style.color = 'var(--green)';
+  }
+
+  // Max RR จากทุก trade
+  const maxEl = document.getElementById('statMaxRR');
+  if (rrValues.length > 0) {
+    const maxRR = Math.max(...rrValues);
+    maxEl.textContent = (maxRR >= 0 ? '+' : '') + maxRR.toFixed(2);
+    maxEl.style.color = maxRR >= 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    maxEl.textContent = '—';
+    maxEl.style.color = 'var(--green)';
+  }
+
+  // Total RR (sum ทุก trade)
+  const totalRREl = document.getElementById('statTotalRR');
+  if (rrValues.length > 0) {
+    const totalRR = rrValues.reduce((a, b) => a + b, 0);
+    totalRREl.textContent = (totalRR >= 0 ? '+' : '') + totalRR.toFixed(2);
+    totalRREl.style.color = totalRR >= 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    totalRREl.textContent = '—';
+    totalRREl.style.color = 'var(--gold)';
+  }
+
   const avgEl = document.getElementById('statAvgRR');
   if (rrValues.length > 0) {
     const avg = rrValues.reduce((a, b) => a + b, 0) / rrValues.length;
@@ -1873,17 +2005,52 @@ function updateStats() {
     avgEl.style.color = 'var(--gold)';
   }
 
-  const tEl = document.getElementById('statTarget');
-  const rEl = document.getElementById('statRemain');
-  if (targetTrades > 0) {
-    tEl.textContent = targetTrades;
-    const remain = targetTrades - trades.length;
-    rEl.textContent = remain > 0 ? remain : 0;
-    rEl.style.color = remain > 0 ? 'var(--muted)' : 'var(--green)';
+  // Profit Factor = ผลรวม RR ของ WIN / |ผลรวม RR ของ LOSS|
+  const pfEl = document.getElementById('statPF');
+  const winRRSum = filtered.filter(t => t.status === 'WIN').map(t => parseFloat(t.rr)).filter(v => !isNaN(v) && v > 0).reduce((a, b) => a + b, 0);
+  const lossRRSum = Math.abs(filtered.filter(t => t.status === 'LOSS').map(t => parseFloat(t.rr)).filter(v => !isNaN(v)).reduce((a, b) => a + b, 0));
+  if (winRRSum > 0 && lossRRSum > 0) {
+    const pf = winRRSum / lossRRSum;
+    pfEl.textContent = pf.toFixed(2);
+    pfEl.style.color = pf >= 1 ? 'var(--green)' : 'var(--red)';
+  } else if (winRRSum > 0 && lossRRSum === 0) {
+    pfEl.textContent = '∞';
+    pfEl.style.color = 'var(--green)';
   } else {
-    tEl.textContent = '—';
-    rEl.textContent = '—';
-    rEl.style.color = 'var(--muted)';
+    pfEl.textContent = '—';
+    pfEl.style.color = 'var(--gold)';
+  }
+
+  // Goal block (centre of header)
+  const done = trades.length;
+  const goalDoneEl = document.getElementById('goalDone');
+  const goalTargetEl = document.getElementById('goalTarget');
+  const goalBarFill = document.getElementById('goalBarFill');
+  const goalRemain = document.getElementById('goalRemainBadge');
+  const goalSub = document.getElementById('goalSubLabel');
+
+  if (goalDoneEl) goalDoneEl.textContent = done;
+
+  if (targetTrades > 0) {
+    if (goalTargetEl) goalTargetEl.textContent = targetTrades;
+    const pct = Math.min(100, Math.round((done / targetTrades) * 100));
+    if (goalBarFill) goalBarFill.style.width = pct + '%';
+    const remain = targetTrades - done;
+    if (goalRemain) {
+      if (remain <= 0) {
+        goalRemain.textContent = '🎯 Goal reached!';
+        goalRemain.className = 'goal-remain-badge done';
+      } else {
+        goalRemain.textContent = remain + ' left';
+        goalRemain.className = 'goal-remain-badge';
+      }
+    }
+    if (goalSub) goalSub.textContent = pct + '% complete';
+  } else {
+    if (goalTargetEl) goalTargetEl.textContent = '—';
+    if (goalBarFill) goalBarFill.style.width = '0%';
+    if (goalRemain) { goalRemain.textContent = '— left'; goalRemain.className = 'goal-remain-badge'; }
+    if (goalSub) goalSub.textContent = 'trades to target';
   }
 }
 
