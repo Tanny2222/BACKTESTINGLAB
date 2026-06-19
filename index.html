@@ -1320,8 +1320,12 @@
       <div class="stat-label">Con. Loss</div>
     </div>
     <div class="stat">
-      <div class="stat-val" id="statPF" style="color:var(--gold)">—</div>
+      <div class="stat-val" id="statPF" style="color:#5B8DEF">—</div>
       <div class="stat-label">Profit Factor</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statTotalRR" style="color:var(--gold)">—</div>
+      <div class="stat-label">Total RR</div>
     </div>
     <div class="stat">
       <div class="stat-val" id="statMinRR" style="color:var(--green)">—</div>
@@ -1330,10 +1334,6 @@
     <div class="stat">
       <div class="stat-val" id="statMaxRR" style="color:var(--green)">—</div>
       <div class="stat-label">Max RR</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statTotalRR" style="color:var(--gold)">—</div>
-      <div class="stat-label">Total RR</div>
     </div>
     <div class="stat">
       <div class="stat-val" id="statAvgRR" style="color:var(--gold)">—</div>
@@ -2012,13 +2012,13 @@ function updateStats() {
   if (winRRSum > 0 && lossRRSum > 0) {
     const pf = winRRSum / lossRRSum;
     pfEl.textContent = pf.toFixed(2);
-    pfEl.style.color = pf >= 1 ? 'var(--green)' : 'var(--red)';
+    pfEl.style.color = pf >= 1 ? '#5B8DEF' : 'var(--red)';
   } else if (winRRSum > 0 && lossRRSum === 0) {
     pfEl.textContent = '∞';
-    pfEl.style.color = 'var(--green)';
+    pfEl.style.color = '#5B8DEF';
   } else {
     pfEl.textContent = '—';
-    pfEl.style.color = 'var(--gold)';
+    pfEl.style.color = '#5B8DEF';
   }
 
   // Goal block (centre of header)
