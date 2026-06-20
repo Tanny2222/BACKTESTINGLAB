@@ -77,9 +77,9 @@
   header {
     border-bottom: 1px solid var(--border);
     padding: 1.25rem 2rem;
-    padding-right: 4rem;
+    padding-right: 3.5rem;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 1.5rem;
     position: sticky;
@@ -1236,6 +1236,52 @@
     .modal-overlay { padding: 1rem; }
   }
 
+  /* ─── Statistics Page ─── */
+  .stats-page { padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 1.75rem; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; transition: border-color .15s, background .15s; }
+  .kpi-card:hover { border-color: var(--gold-dim); background: var(--surface2); }
+  .kpi-val { font-family: var(--font-mono); font-size: 26px; font-weight: 700; line-height: 1; }
+  .kpi-label { font-size: 10px; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; }
+  .kpi-sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+  .stat-section-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .stat-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .charts-row { display: grid; gap: 12px; }
+  .charts-row.col2 { grid-template-columns: 1fr 1fr; }
+  .charts-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .charts-row.col-3-2 { grid-template-columns: 3fr 2fr; }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+  .chart-card-title { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .chart-card-title .badge { font-size: 11px; font-family: var(--font-mono); background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 1px 8px; color: var(--text); font-weight: 600; letter-spacing: 0; text-transform: none; }
+  .chart-svg { width: 100%; overflow: visible; }
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .donut-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .donut-legend-label { color: var(--muted); flex: 1; }
+  .donut-legend-val { font-family: var(--font-mono); font-weight: 600; }
+  .tag-stat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tag-stat-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .tag-stat-table th:not(:first-child) { text-align: right; }
+  .tag-stat-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .tag-stat-table td:not(:first-child) { text-align: right; font-family: var(--font-mono); }
+  .tag-stat-table tbody tr:last-child td { border-bottom: none; }
+  .tag-stat-table tbody tr:hover { background: var(--surface2); }
+  .tag-pill-sm { display: inline-block; padding: 2px 8px; border-radius: 99px; background: var(--surface2); border: 1px solid var(--border); font-size: 11px; color: var(--text); }
+  .rr-bar-wrap { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+  .rr-bar-track { width: 60px; height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .rr-bar-fill { height: 100%; border-radius: 99px; }
+  .session-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .session-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .session-card-name { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .session-card-wr { font-family: var(--font-mono); font-size: 18px; font-weight: 700; line-height: 1; margin: 4px 0; }
+  .session-card-sub { font-size: 10px; color: var(--muted); }
+  .session-bar-track { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .session-bar-fill { height: 100%; border-radius: 99px; }
+  .stats-empty { text-align: center; padding: 5rem 2rem; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .stats-empty svg { width: 44px; height: 44px; stroke: var(--muted); fill: none; stroke-width: 1.5; opacity: .4; }
+  .stats-empty h3 { font-size: 15px; color: var(--text); }
+
   /* ─── Loading / Sync indicator ─── */
   .sync-indicator {
     display: none;
@@ -1301,53 +1347,26 @@
     <div class="goal-label" id="goalSubLabel" style="letter-spacing:0.05em;text-transform:none;font-size:11px;color:var(--muted)">trades to target</div>
   </div>
 
-  <!-- ── Stats Bar (right) ── -->
-  <div class="stats-bar" id="statsBar">
-    <div class="stat">
-      <div class="stat-val" id="statTotal">0</div>
-      <div class="stat-label">Total Trades</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statWinrate" style="color:var(--gold)">—</div>
-      <div class="stat-label">Winrate</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statConWin" style="color:var(--green)">0</div>
-      <div class="stat-label">Con. Win</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statConLoss" style="color:var(--red)">0</div>
-      <div class="stat-label">Con. Loss</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statPF" style="color:#5B8DEF">—</div>
-      <div class="stat-label">Profit Factor</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statTotalRR" style="color:var(--gold)">—</div>
-      <div class="stat-label">Total RR</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statMinRR" style="color:var(--green)">—</div>
-      <div class="stat-label">Min RR (Win)</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statMaxRR" style="color:var(--green)">—</div>
-      <div class="stat-label">Max RR</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statAvgRR" style="color:var(--gold)">—</div>
-      <div class="stat-label">Avg. RR</div>
-    </div>
-  </div>
 </header>
 
+<!-- hidden stat elements for JS compatibility -->
+<span id="statTotal" style="display:none">0</span>
+<span id="statWinrate" style="display:none">—</span>
+<span id="statTotalRR" style="display:none">—</span>
+<span id="statConWin" style="display:none">0</span>
+<span id="statConLoss" style="display:none">0</span>
+<span id="statPF" style="display:none">—</span>
+<span id="statMinRR" style="display:none">—</span>
+<span id="statMaxRR" style="display:none">—</span>
+<span id="statAvgRR" style="display:none">—</span>
+
 <div class="page-tabs">
-  <button class="page-tab active" id="tabTrades" onclick="switchPage('trades')">Trades</button>
+  <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">Statistics</button>
+  <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">Trades</button>
   <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">Gallery</button>
 </div>
 
-<div id="pageTrades" class="page-view active">
+<div id="pageTrades" class="page-view">
 <div class="toolbar">
   <button class="btn btn-primary" onclick="openAddModal()">
     <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
@@ -1421,12 +1440,6 @@
 </div>
 
 <div id="pageGallery" class="page-view">
-  <div class="gallery-toolbar">
-    <button class="btn" onclick="shuffleGallery()">
-      <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 16 16"><path d="M2 4h3l5 8h4M2 12h3l1.5-2.4M11.5 4H14M14 4l-2-2M14 4l-2 2M14 12l-2 2M14 12l-2-2"/></svg>
-      สุ่มรูปใหม่
-    </button>
-  </div>
   <div class="gallery-section">
     <div class="gallery-section-title status-WIN">
       <span class="gallery-title-icon">▲</span>
@@ -1442,6 +1455,13 @@
       <span class="gallery-title-count" id="galleryLossCount">0</span>
     </div>
     <div class="gallery-grid" id="galleryLoss"></div>
+  </div>
+</div>
+
+<!-- ═══ Statistics Page ═══ -->
+<div id="pageStats" class="page-view active">
+  <div class="stats-page" id="statsPageContent">
+    <!-- filled by renderStats() -->
   </div>
 </div>
 
@@ -1738,6 +1758,7 @@ async function loadTrades() {
     trades = await apiGet();
     renderCards();
     updateStats();
+    renderStats();
     hideSync();
   } catch(e) {
     showSync('โหลดข้อมูลไม่สำเร็จ: ' + e.message, true);
@@ -2504,11 +2525,14 @@ document.addEventListener('keydown', e => {
 
 // ── Page navigation ──
 function switchPage(page) {
-  document.getElementById('pageTrades').classList.toggle('active', page === 'trades');
-  document.getElementById('pageGallery').classList.toggle('active', page === 'gallery');
-  document.getElementById('tabTrades').classList.toggle('active', page === 'trades');
-  document.getElementById('tabGallery').classList.toggle('active', page === 'gallery');
+  ['trades','gallery','stats'].forEach(p => {
+    document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1))
+      .classList.toggle('active', p === page);
+    const tab = document.getElementById('tab' + p.charAt(0).toUpperCase() + p.slice(1));
+    if (tab) tab.classList.toggle('active', p === page);
+  });
   if (page === 'gallery') renderGallery();
+  if (page === 'stats') renderStats();
 }
 
 function goToTrade(id) {
@@ -2594,6 +2618,459 @@ function populateEntryTimeOptions() {
     opt.textContent = label;
     select.appendChild(opt);
   }
+}
+
+// ══════════════════════════════════════════════
+// ── Statistics Page ──
+// ══════════════════════════════════════════════
+function renderStats() {
+  const el = document.getElementById('statsPageContent');
+  if (!el) return;
+  const t = trades;
+
+  if (!t.length) {
+    el.innerHTML = `<div class="stats-empty">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+      <h3>ยังไม่มีข้อมูล Trade</h3>
+      <p>เพิ่ม Trade ในหน้า Trades ก่อน แล้วกลับมาดู Statistics</p>
+    </div>`;
+    return;
+  }
+
+  const wins   = t.filter(x => x.status === 'WIN');
+  const losses = t.filter(x => x.status === 'LOSS');
+  const bes    = t.filter(x => x.status === 'BE');
+  const decided = wins.length + losses.length;
+  const winrate = decided > 0 ? (wins.length / decided * 100) : 0;
+
+  const rrAll  = t.map(x => parseFloat(x.rr)).filter(v => !isNaN(v));
+  const rrWin  = wins.map(x => parseFloat(x.rr)).filter(v => !isNaN(v));
+  const rrLoss = losses.map(x => parseFloat(x.rr)).filter(v => !isNaN(v));
+  const totalRR = rrAll.reduce((a,b)=>a+b,0);
+  const avgRR   = rrAll.length ? totalRR / rrAll.length : 0;
+  const avgWin  = rrWin.length  ? rrWin.reduce((a,b)=>a+b,0)  / rrWin.length  : 0;
+  const avgLoss = rrLoss.length ? rrLoss.reduce((a,b)=>a+b,0) / rrLoss.length : 0;
+  const maxRR   = rrAll.length ? Math.max(...rrAll) : 0;
+  const minWinRR= rrWin.length  ? Math.min(...rrWin)  : 0;
+  const winRRSum  = rrWin.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const lossRRSum = Math.abs(rrLoss.reduce((a,b)=>a+b,0));
+  const pf = (winRRSum > 0 && lossRRSum > 0) ? winRRSum / lossRRSum : null;
+
+  // Consecutive streaks
+  const sorted = t.slice().sort((a,b) => {
+    const da = a.tradeDate||a.date||'', db = b.tradeDate||b.date||'';
+    return da < db ? -1 : da > db ? 1 : (parseInt(a.tradeNo)||0) - (parseInt(b.tradeNo)||0);
+  });
+  let conW=0,conL=0,cW=0,cL=0;
+  sorted.forEach(x => {
+    if (x.status==='WIN') { cW++; cL=0; if(cW>conW) conW=cW; }
+    else if (x.status==='LOSS') { cL++; cW=0; if(cL>conL) conL=cL; }
+    else { cW=0; cL=0; }
+  });
+
+  // Expect value = winrate * avgWin + (1-winrate) * avgLoss
+  const ev = winrate/100 * avgWin + (1 - winrate/100) * avgLoss;
+
+  const c = v => v >= 0 ? 'var(--green)' : 'var(--red)';
+  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(2);
+  const pct = v => Math.round(v) + '%';
+
+  // ── Equity curve data ──
+  let equity = 0;
+  const eqPoints = [{n:0, v:0}];
+  sorted.forEach((x,i) => {
+    const r = parseFloat(x.rr);
+    if (!isNaN(r)) equity += r;
+    eqPoints.push({ n: i+1, v: equity });
+  });
+
+  // ── By session ──
+  const sessions = ['asia','london','ny','oos'];
+  const sessNames = { asia:'Asia', london:'London', ny:'New York', oos:'Out of Session' };
+  const sessColors = { asia:'#63B3ED', london:'#9A75DC', ny:'#F6AD55', oos:'#A0A8C0' };
+  const sessData = sessions.map(s => {
+    const st = t.filter(x => x.session === s);
+    const sw = st.filter(x => x.status==='WIN').length;
+    const sl = st.filter(x => x.status==='LOSS').length;
+    const sd = sw + sl;
+    const wr = sd > 0 ? sw/sd*100 : 0;
+    const rrs = st.map(x=>parseFloat(x.rr)).filter(v=>!isNaN(v));
+    const trr = rrs.reduce((a,b)=>a+b,0);
+    return { s, sw, sl, sd, st: st.length, wr, trr, color: sessColors[s] };
+  }).filter(x => x.st > 0);
+
+  // ── By Day of Week ──
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayData = days.map((d,i) => {
+    const dt = t.filter(x => {
+      if (!x.tradeDate) return false;
+      return new Date(x.tradeDate).getDay() === i;
+    });
+    const dw = dt.filter(x=>x.status==='WIN').length;
+    const dl = dt.filter(x=>x.status==='LOSS').length;
+    const dd = dw+dl;
+    const rrs = dt.map(x=>parseFloat(x.rr)).filter(v=>!isNaN(v));
+    return { d, n: dt.length, w: dw, l: dl, wr: dd>0?dw/dd*100:0, trr: rrs.reduce((a,b)=>a+b,0) };
+  });
+
+  // ── By Entry Time (hour) ──
+  const hourMap = {};
+  t.forEach(x => {
+    if (!x.entryTime) return;
+    const h = x.entryTime.split(':')[0];
+    if (!hourMap[h]) hourMap[h] = { w:0, l:0, rr:0 };
+    if (x.status==='WIN') hourMap[h].w++;
+    else if (x.status==='LOSS') hourMap[h].l++;
+    const r = parseFloat(x.rr);
+    if (!isNaN(r)) hourMap[h].rr += r;
+  });
+
+  // ── By Tag ──
+  const tagMap = {};
+  t.forEach(x => {
+    (Array.isArray(x.tags) ? x.tags : []).forEach(tag => {
+      if (!tagMap[tag]) tagMap[tag] = { w:0, l:0, be:0, rrs:[] };
+      if (x.status==='WIN') tagMap[tag].w++;
+      else if (x.status==='LOSS') tagMap[tag].l++;
+      else tagMap[tag].be++;
+      const r = parseFloat(x.rr);
+      if (!isNaN(r)) tagMap[tag].rrs.push(r);
+    });
+  });
+  const tagRows = Object.entries(tagMap).map(([tag, v]) => {
+    const d = v.w + v.l;
+    const wr = d > 0 ? v.w/d*100 : 0;
+    const trr = v.rrs.reduce((a,b)=>a+b,0);
+    const avg = v.rrs.length ? trr/v.rrs.length : 0;
+    return { tag, total: v.w+v.l+v.be, w:v.w, l:v.l, wr, trr, avg };
+  }).sort((a,b) => b.total - a.total);
+
+  // ── RR Distribution buckets ──
+  const buckets = [
+    { label: '<−2', min:-Infinity, max:-2 },
+    { label: '−2', min:-2, max:-1 },
+    { label: '−1', min:-1, max:0 },
+    { label: '0', min:0, max:0.01 },
+    { label: '1R', min:0.01, max:1 },
+    { label: '2R', min:1, max:2 },
+    { label: '3R', min:2, max:3 },
+    { label: '>3R', min:3, max:Infinity },
+  ];
+  const distData = buckets.map(b => ({
+    ...b,
+    count: rrAll.filter(v => v > b.min && v <= b.max).length
+  }));
+
+  // ────────────────── RENDER ──────────────────
+
+  // Helper: SVG bar chart (horizontal label bottom)
+  function barChart(data, W, H, getColor) {
+    // data: [{label, value, color?}]
+    const pad = { t:10, r:4, b:32, l:4 };
+    const cw = W - pad.l - pad.r;
+    const ch = H - pad.t - pad.b;
+    const max = Math.max(...data.map(d=>Math.abs(d.value)), 0.001);
+    const bw = Math.floor(cw / data.length) - 4;
+    let bars = '';
+    data.forEach((d,i) => {
+      const bh = Math.max(2, Math.abs(d.value) / max * ch);
+      const x = pad.l + i * (cw / data.length) + (cw/data.length - bw)/2;
+      const y = pad.t + (ch - bh);
+      const col = d.color || getColor(d.value);
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="0.85"/>`;
+      if (d.value !== 0) {
+        const label = typeof d.value === 'number' && !Number.isInteger(d.value) ? d.value.toFixed(1) : d.value;
+        bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-3).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${label}</text>`;
+      }
+      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+16).toFixed(1)}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="9" fill="var(--muted)">${d.label}</text>`;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+      <line x1="${pad.l}" y1="${pad.t+ch}" x2="${W-pad.r}" y2="${pad.t+ch}" stroke="var(--border)" stroke-width="1"/>
+      ${bars}
+    </svg>`;
+  }
+
+  // Helper: Donut
+  function donut(slices, size=120) {
+    const r = 38, cx=size/2, cy=size/2, stroke=14;
+    const total = slices.reduce((a,b)=>a+b.v,0);
+    if (!total) return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${stroke}"/></svg>`;
+    let offset = -90;
+    let arcs = '';
+    const circ = 2 * Math.PI * r;
+    slices.forEach(sl => {
+      const deg = sl.v / total * 360;
+      const rad = offset * Math.PI / 180;
+      const rad2 = (offset + deg) * Math.PI / 180;
+      const x1 = cx + r * Math.cos(rad), y1 = cy + r * Math.sin(rad);
+      const x2 = cx + r * Math.cos(rad2), y2 = cy + r * Math.sin(rad2);
+      const large = deg > 180 ? 1 : 0;
+      arcs += `<path d="M${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)}" fill="none" stroke="${sl.color}" stroke-width="${stroke}" stroke-linecap="butt"/>`;
+      offset += deg;
+    });
+    const pctMain = Math.round(slices[0].v / total * 100);
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="${stroke}"/>
+      ${arcs}
+      <text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="15" font-weight="700" fill="var(--text)">${pctMain}%</text>
+      <text x="${cx}" y="${cy+12}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="9" fill="var(--muted)">WIN</text>
+    </svg>`;
+  }
+
+  // Helper: Equity Curve SVG
+  function equitySVG(pts, W=600, H=120) {
+    if (pts.length < 2) return '';
+    const pad = {t:10,r:10,b:20,l:40};
+    const cw = W - pad.l - pad.r;
+    const ch = H - pad.t - pad.b;
+    const maxV = Math.max(...pts.map(p=>p.v), 0.01);
+    const minV = Math.min(...pts.map(p=>p.v), -0.01);
+    const range = maxV - minV || 1;
+    const xs = i => pad.l + i/(pts.length-1) * cw;
+    const ys = v => pad.t + ch - (v - minV)/range * ch;
+    const zeroY = ys(0);
+    const polyline = pts.map((p,i)=>`${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ');
+    const areaPath = `M${xs(0).toFixed(1)},${zeroY.toFixed(1)} ` +
+      pts.map((p,i)=>`L${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ') +
+      ` L${xs(pts.length-1).toFixed(1)},${zeroY.toFixed(1)} Z`;
+    // y-axis labels
+    const yTicks = [minV, 0, maxV].map(v => ({
+      v, y: ys(v),
+      label: (v>=0?'+':'')+v.toFixed(1)
+    }));
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="eqG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--gold)" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <line x1="${pad.l}" y1="${zeroY.toFixed(1)}" x2="${W-pad.r}" y2="${zeroY.toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+      ${yTicks.map(tick=>`<text x="${(pad.l-4).toFixed(1)}" y="${tick.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${tick.label}</text>`).join('')}
+      <path d="${areaPath}" fill="url(#eqG)"/>
+      <polyline points="${polyline}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${xs(pts.length-1).toFixed(1)}" cy="${ys(pts[pts.length-1].v).toFixed(1)}" r="3" fill="var(--gold)"/>
+    </svg>`;
+  }
+
+  // ── Day of Week bar chart ──
+  function dowChart() {
+    const active = dayData.filter(d=>d.n>0);
+    if (!active.length) return '<div style="color:var(--muted);font-size:12px;padding:1rem 0">ไม่มีข้อมูล Date</div>';
+    return barChart(
+      dayData.map(d => ({ label: d.d, value: d.trr, color: d.trr >= 0 ? 'var(--green)' : 'var(--red)' })),
+      420, 130, v => v>=0 ? 'var(--green)' : 'var(--red)'
+    );
+  }
+
+  // ── RR Distribution chart ──
+  function distChart() {
+    const maxC = Math.max(...distData.map(d=>d.count), 1);
+    const W=420, H=120, pad={t:10,r:4,b:32,l:4};
+    const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+    const bw = Math.floor(cw/distData.length)-4;
+    let bars = '';
+    distData.forEach((d,i) => {
+      const bh = d.count > 0 ? Math.max(4, d.count/maxC*ch) : 0;
+      const x = pad.l + i*(cw/distData.length) + (cw/distData.length-bw)/2;
+      const y = pad.t + ch - bh;
+      const isPos = d.min >= 0;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${isPos?'var(--green)':'var(--red)'}" opacity="0.8"/>`;
+      if (d.count>0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-3).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${d.count}</text>`;
+      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+16).toFixed(1)}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="9" fill="var(--muted)">${d.label}</text>`;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+      <line x1="${pad.l}" y1="${pad.t+ch}" x2="${W-pad.r}" y2="${pad.t+ch}" stroke="var(--border)" stroke-width="1"/>
+      ${bars}
+    </svg>`;
+  }
+
+  // ── Session cards ──
+  function sessCards() {
+    if (!sessData.length) return '<div style="color:var(--muted);font-size:12px">ไม่มีข้อมูล Session</div>';
+    return `<div class="session-grid">` + sessions.map(s => {
+      const d = sessData.find(x=>x.s===s);
+      if (!d) return '';
+      const wr = d.wr;
+      const col = d.color;
+      const trrFmt = (d.trr>=0?'+':'')+d.trr.toFixed(2);
+      return `<div class="session-card" style="border-color:${col}22">
+        <div class="session-card-name" style="color:${col}">${sessNames[s]}</div>
+        <div class="session-card-wr" style="color:${wr>=50?'var(--green)':'var(--red)'}">${Math.round(wr)}%</div>
+        <div class="session-card-sub">${d.sw}W / ${d.sl}L / ${d.st} trades</div>
+        <div class="session-card-sub" style="color:${d.trr>=0?'var(--green)':'var(--red)'}">RR ${trrFmt}</div>
+        <div class="session-bar-track"><div class="session-bar-fill" style="width:${wr}%;background:${col}"></div></div>
+      </div>`;
+    }).join('') + '</div>';
+  }
+
+  // ── Tag table ──
+  function tagTable() {
+    if (!tagRows.length) return '<div style="color:var(--muted);font-size:12px;padding:0.5rem 0">ไม่มี Tag</div>';
+    const maxAbsRR = Math.max(...tagRows.map(r=>Math.abs(r.trr)), 0.01);
+    return `<table class="tag-stat-table">
+      <thead><tr>
+        <th>Tag</th><th>Trades</th><th>W</th><th>L</th><th>WR%</th><th>Total RR</th><th>Avg RR</th>
+      </tr></thead>
+      <tbody>${tagRows.map(r => {
+        const barW = Math.abs(r.trr)/maxAbsRR*100;
+        const bCol = r.trr>=0?'var(--green)':'var(--red)';
+        return `<tr>
+          <td><span class="tag-pill-sm">${r.tag}</span></td>
+          <td>${r.total}</td>
+          <td style="color:var(--green)">${r.w}</td>
+          <td style="color:var(--red)">${r.l}</td>
+          <td style="color:${r.wr>=50?'var(--green)':'var(--red)'}">${Math.round(r.wr)}%</td>
+          <td>
+            <div class="rr-bar-wrap">
+              <div class="rr-bar-track"><div class="rr-bar-fill" style="width:${barW}%;background:${bCol}"></div></div>
+              <span style="color:${bCol}">${fmt(r.trr)}</span>
+            </div>
+          </td>
+          <td style="color:${r.avg>=0?'var(--green)':'var(--red)'}">${fmt(r.avg)}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+
+  // ── Render all ──
+  el.innerHTML = `
+
+  <!-- KPI Row -->
+  <div>
+    <div class="stat-section-title">Overview</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--text)">${t.length}</div>
+        <div class="kpi-label">Total Trades</div>
+        <div class="kpi-sub">${wins.length}W · ${losses.length}L · ${bes.length}BE</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:${winrate>=50?'var(--green)':'var(--red)'}">${pct(winrate)}</div>
+        <div class="kpi-label">Winrate</div>
+        <div class="kpi-sub">${wins.length}/${decided} decided</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)}</div>
+        <div class="kpi-label">Total RR</div>
+        <div class="kpi-sub">Avg ${fmt(avgRR)} / trade</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:${pf!=null&&pf>=1?'#5B8DEF':'var(--red)'}">${pf!=null?pf.toFixed(2):'—'}</div>
+        <div class="kpi-label">Profit Factor</div>
+        <div class="kpi-sub">W RR / |L RR|</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:${ev>=0?'var(--green)':'var(--red)'}">${fmt(ev)}</div>
+        <div class="kpi-label">Expect. Value</div>
+        <div class="kpi-sub">per trade</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Row 2 -->
+  <div>
+    <div class="stat-section-title">RR Breakdown</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--gold)">${fmt(maxRR)}</div>
+        <div class="kpi-label">Best Trade RR</div>
+        <div class="kpi-sub">Max RR</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--green)">${rrWin.length?fmt(avgWin):'—'}</div>
+        <div class="kpi-label">Avg Win RR</div>
+        <div class="kpi-sub">from ${rrWin.length} wins</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--red)">${rrLoss.length?fmt(avgLoss):'—'}</div>
+        <div class="kpi-label">Avg Loss RR</div>
+        <div class="kpi-sub">from ${rrLoss.length} losses</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--green)">${conW}</div>
+        <div class="kpi-label">Max Con. Win</div>
+        <div class="kpi-sub">streak</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--red)">${conL}</div>
+        <div class="kpi-label">Max Con. Loss</div>
+        <div class="kpi-sub">streak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equity + Donut -->
+  <div>
+    <div class="stat-section-title">Equity Curve & Win/Loss Split</div>
+    <div class="charts-row col-3-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Cumulative RR
+          <span class="badge" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)} R</span>
+        </div>
+        ${equitySVG(eqPoints, 580, 130)}
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Result Split</div>
+        <div class="donut-wrap">
+          ${donut([
+            {v:wins.length, color:'var(--green)'},
+            {v:losses.length, color:'var(--red)'},
+            {v:bes.length, color:'var(--gold)'}
+          ], 110)}
+          <div class="donut-legend">
+            <div class="donut-legend-item">
+              <div class="donut-legend-dot" style="background:var(--green)"></div>
+              <span class="donut-legend-label">WIN</span>
+              <span class="donut-legend-val" style="color:var(--green)">${wins.length}</span>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-dot" style="background:var(--red)"></div>
+              <span class="donut-legend-label">LOSS</span>
+              <span class="donut-legend-val" style="color:var(--red)">${losses.length}</span>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-dot" style="background:var(--gold)"></div>
+              <span class="donut-legend-label">BE</span>
+              <span class="donut-legend-val" style="color:var(--gold)">${bes.length}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RR Distribution + Day of Week -->
+  <div>
+    <div class="stat-section-title">Distribution & Day of Week</div>
+    <div class="charts-row col2">
+      <div class="chart-card">
+        <div class="chart-card-title">RR Distribution <span class="badge">${rrAll.length} trades</span></div>
+        ${distChart()}
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Total RR by Day of Week</div>
+        ${dowChart()}
+      </div>
+    </div>
+  </div>
+
+  <!-- Session -->
+  <div>
+    <div class="stat-section-title">Performance by Session</div>
+    ${sessCards()}
+  </div>
+
+  <!-- Tags -->
+  ${tagRows.length ? `<div>
+    <div class="stat-section-title">Performance by Tag</div>
+    <div class="chart-card">
+      <div class="chart-card-title">Tag Breakdown <span class="badge">${tagRows.length} tags</span></div>
+      ${tagTable()}
+    </div>
+  </div>` : ''}
+
+  `;
 }
 
 // ── Init ──
