@@ -1573,10 +1573,11 @@
 <span id="statAvgRR" style="display:none">—</span>
 
 <div class="page-tabs">
-  <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">Statistics</button>
-  <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">Trades</button>
-  <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">Gallery</button>
-  <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">Risk Management</button>
+  <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">📊 Statistics</button>
+  <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">📋 Trades</button>
+  <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">🖼️ Gallery</button>
+  <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">🛡️ Risk Management</button>
+  <button class="page-tab" id="tabMC" onclick="switchPage('mc')">🎲 Monte Carlo</button>
 </div>
 
 <div id="pageTrades" class="page-view">
@@ -1744,6 +1745,163 @@
 
   </div>
 </div>
+
+<!-- ═══ Monte Carlo Page ═══ -->
+<div id="pageMc" class="page-view">
+  <div style="padding:1.5rem 2rem;max-width:1200px;margin:0 auto">
+
+    <div style="margin-bottom:1.5rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">🎲 Monte Carlo Simulation</div>
+        <div style="font-size:13px;color:var(--muted)">จำลองผลลัพธ์แบบสุ่มจากข้อมูล Backtest ของคุณ — ดูความเสี่ยงและความเป็นไปได้ในระยะยาว</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:1.5rem">
+      <div class="kpi-card" style="padding:16px 18px;gap:8px;display:flex;flex-direction:column;border-color:var(--gold)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold)">จำนวนรอบ Simulation</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="mcSimCount" value="1000" min="100" max="10000" step="100"
+            style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:16px;font-weight:600;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+        <div style="font-size:11px;color:var(--muted)">100 – 10,000 รอบ</div>
+      </div>
+      <div class="kpi-card" style="padding:16px 18px;gap:8px;display:flex;flex-direction:column">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Trades ต่อ Simulation</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="mcTradeCount" value="100" min="10" max="1000" step="10"
+            style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:16px;font-weight:600;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+        <div style="font-size:11px;color:var(--muted)">จำนวน Trade ใน 1 เส้น</div>
+      </div>
+      <div class="kpi-card" style="padding:16px 18px;gap:8px;display:flex;flex-direction:column">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Risk per Trade (%)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="mcRiskPct" value="1" min="0.1" max="20" step="0.1"
+            style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:16px;font-weight:600;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+          <span style="color:var(--muted);font-size:13px;white-space:nowrap">%</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">% ของ Port ที่ Risk ต่อไม้</div>
+      </div>
+      <div class="kpi-card" style="padding:16px 18px;gap:8px;display:flex;flex-direction:column">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--red)">Ruin Threshold (%)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="mcRuinPct" value="20" min="1" max="99" step="1"
+            style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:16px;font-weight:600;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'" />
+          <span style="color:var(--muted);font-size:13px;white-space:nowrap">% DD</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">ถ้า Port ลดลงเกินนี้ = Ruin</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.5rem;flex-wrap:wrap">
+      <div id="mcDataInfo" style="font-size:13px;color:var(--muted);padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);flex:1;min-width:200px">
+        กำลังโหลดข้อมูล…
+      </div>
+      <button onclick="runMonteCarlo()" style="padding:10px 24px;background:var(--gold);color:#0D0F14;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;font-family:var(--font-body);cursor:pointer;letter-spacing:0.04em;transition:background 0.15s;white-space:nowrap"
+        onmouseover="this.style.background='#dbb85a'" onmouseout="this.style.background='var(--gold)'">
+        ▶ Run Simulation
+      </button>
+    </div>
+
+    <div id="mcResults" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:1.5rem" id="mcKpiRow"></div>
+      <div class="chart-card" style="margin-bottom:1.5rem">
+        <div class="stat-section-title">Equity Curve Fan Chart <span style="color:var(--muted);font-weight:400;font-size:11px;margin-left:8px">เส้นสีทอง = Median · เขียว = P95 · แดง = P5</span></div>
+        <canvas id="mcEquityCanvas" height="280" style="width:100%;display:block"></canvas>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem" class="mc-two-col">
+        <div class="chart-card">
+          <div class="stat-section-title">Max Drawdown Distribution</div>
+          <canvas id="mcDDCanvas" height="220" style="width:100%;display:block"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="stat-section-title">Percentile Table — Final Equity</div>
+          <div id="mcPercentileTable" style="overflow-x:auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="mcEmpty" style="text-align:center;padding:3rem 2rem;color:var(--muted)">
+      <div style="font-size:48px;margin-bottom:12px">🎲</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">พร้อม Simulate แล้ว</div>
+      <div style="font-size:13px">ตั้งค่า Parameter ด้านบน แล้วกด <strong style="color:var(--gold)">Run Simulation</strong></div>
+      <div style="font-size:12px;margin-top:8px">ต้องมีข้อมูล Trade ≥ 5 รายการที่มี RR จึงจะ Simulate ได้</div>
+    </div>
+
+    <!-- How to read guide -->
+    <div style="margin-top:1.5rem">
+      <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+        <span>📖</span> วิธีแปลผล Monte Carlo
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">🎯 มันคืออะไร?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            Monte Carlo สุ่มลำดับ Trade จากข้อมูล Backtest จริงของคุณซ้ำหลายพันรอบ — แต่ละรอบเรียงลำดับต่างกัน เพื่อดูว่า <strong style="color:var(--text)">ระบบของคุณจะรอดหรือพังในสถานการณ์แย่สุด</strong>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">📈 Equity Curve Fan</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            <span style="color:#3BBF7E">● เส้นเขียว (P95)</span> = กรณีดีที่สุด 5% บน<br>
+            <span style="color:#C9A84C">● เส้นทอง (P50)</span> = ผลลัพธ์กลาง ๆ ที่เกิดจริงบ่อยที่สุด<br>
+            <span style="color:#E05A5A">● เส้นแดง (P5)</span> = กรณีแย่ที่สุด 5% ล่าง<br>
+            <span style="color:var(--muted)">Zone สีทอง = ช่วง P25–P75 ที่เป็นไปได้มากที่สุด</span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">📉 Max Drawdown Histogram</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            แสดงว่า Max DD ที่เจอในแต่ละ simulation กระจุกอยู่ที่ระดับไหน<br>
+            <span style="color:#E05A5A">● แท่งสีแดง</span> = simulation ที่ DD เกิน Ruin Threshold<br>
+            ถ้าแท่งสีแดงมีเยอะ → Risk ต่อไม้ของคุณสูงเกินไป
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">🎰 Ruin Probability</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            % ของ simulation ที่ Port ลงลึกเกิน Ruin Threshold ที่ตั้งไว้<br><br>
+            <span style="color:#3BBF7E">● &lt; 3%</span> = ปลอดภัย ✓<br>
+            <span style="color:#F6AD55">● 3–10%</span> = ควรระวัง ⚠<br>
+            <span style="color:#E05A5A">● &gt; 10%</span> = Risk สูงเกินไป ✕
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">📊 Percentile Table</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            <strong style="color:var(--text)">P50 = ผลลัพธ์ที่ "ปกติ"</strong> — ครึ่งหนึ่งของ simulation ได้มากกว่านี้ ครึ่งหนึ่งได้น้อยกว่า<br><br>
+            P5 คือ "ถ้าโชคร้ายมาก" — ถ้า P5 ยัง Positive แสดงว่าระบบแข็งแกร่งมาก
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">⚙️ ปรับ Parameter อย่างไร?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.75">
+            ลด <strong style="color:var(--text)">Risk % ต่อไม้</strong> จนกว่า Ruin Probability จะ &lt; 3%<br>
+            เพิ่ม <strong style="color:var(--text)">Trades ต่อ Simulation</strong> ให้ใกล้เคียง Trade Target จริง<br>
+            ตั้ง <strong style="color:var(--text)">Ruin Threshold</strong> เท่ากับ Max DD Limit ของ Prop Firm หรือ Port จริง
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@media (max-width: 700px) { .mc-two-col { grid-template-columns: 1fr !important; } }
+</style>
 
 <!-- Add/Edit Modal -->
 <div class="modal-overlay" id="modal">
@@ -2837,7 +2995,7 @@ document.addEventListener('keydown', e => {
 
 // ── Page navigation ──
 function switchPage(page) {
-  ['trades','gallery','stats','risk'].forEach(p => {
+  ['trades','gallery','stats','risk','mc'].forEach(p => {
     document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1))
       .classList.toggle('active', p === page);
     const tab = document.getElementById('tab' + p.charAt(0).toUpperCase() + p.slice(1));
@@ -2846,6 +3004,7 @@ function switchPage(page) {
   if (page === 'gallery') renderGallery();
   if (page === 'stats') renderStats();
   if (page === 'risk') calcRisk();
+  if (page === 'mc') mcUpdateDataInfo();
 }
 
 function goToTrade(id) {
@@ -3696,6 +3855,329 @@ function calcRisk() {
   `;
 }
 
+
+// ============================================================
+//  MONTE CARLO SIMULATION
+// ============================================================
+
+let mcEquityChart = null;
+let mcDDChart = null;
+
+function mcGetRRs() {
+  return trades
+    .filter(t => t.status === 'WIN' || t.status === 'LOSS' || t.status === 'BE')
+    .filter(t => typeof t.rr === 'number' && !isNaN(t.rr))
+    .map(t => t.rr);
+}
+
+function mcUpdateDataInfo() {
+  const rrs = mcGetRRs();
+  const el = document.getElementById('mcDataInfo');
+  if (!el) return;
+  if (rrs.length < 5) {
+    el.innerHTML = `<span style="color:var(--red)">⚠ ยังไม่มีข้อมูลเพียงพอ — ต้องการ Trade ที่มี RR ≥ 5 รายการ (ปัจจุบัน ${rrs.length} รายการ)</span>`;
+  } else {
+    const wins = rrs.filter(r => r > 0).length;
+    const wr = (wins / rrs.length * 100).toFixed(1);
+    const avgWin = rrs.filter(r => r > 0).reduce((a,b) => a+b, 0) / (wins || 1);
+    const avgLoss = rrs.filter(r => r <= 0).reduce((a,b) => a+b, 0) / (rrs.filter(r => r <= 0).length || 1);
+    el.innerHTML = `✅ ใช้ข้อมูลจาก <strong style="color:var(--text)">${rrs.length} Trade</strong> &nbsp;|&nbsp; Winrate <strong style="color:var(--green)">${wr}%</strong> &nbsp;|&nbsp; Avg Win <strong style="color:var(--green)">+${avgWin.toFixed(2)}R</strong> &nbsp;|&nbsp; Avg Loss <strong style="color:var(--red)">${avgLoss.toFixed(2)}R</strong>`;
+  }
+}
+
+function runMonteCarlo() {
+  const rrs = mcGetRRs();
+  if (rrs.length < 5) { alert('ต้องการข้อมูล Trade ที่มี RR ≥ 5 รายการ'); return; }
+
+  const simCount    = Math.min(10000, Math.max(100, parseInt(document.getElementById('mcSimCount').value) || 1000));
+  const tradeCount  = Math.min(1000, Math.max(10, parseInt(document.getElementById('mcTradeCount').value) || 100));
+  const riskPct     = Math.min(20, Math.max(0.1, parseFloat(document.getElementById('mcRiskPct').value) || 1)) / 100;
+  const ruinThresh  = Math.min(99, Math.max(1, parseFloat(document.getElementById('mcRuinPct').value) || 20)) / 100;
+
+  // Run simulations — compound equity curves
+  const allCurves = [];
+  const finalEquities = [];
+  const maxDDs = [];
+  let ruinCount = 0;
+
+  for (let s = 0; s < simCount; s++) {
+    let equity = 1.0;
+    let peak = 1.0;
+    let maxDD = 0;
+    let ruined = false;
+    const curve = [1.0];
+
+    for (let t = 0; t < tradeCount; t++) {
+      const rr = rrs[Math.floor(Math.random() * rrs.length)];
+      // compound: win/loss as fraction of current equity
+      if (rr > 0) {
+        equity *= (1 + riskPct * rr);
+      } else {
+        equity *= (1 + riskPct * rr); // rr negative → loss
+      }
+      if (equity > peak) peak = equity;
+      const dd = (peak - equity) / peak;
+      if (dd > maxDD) maxDD = dd;
+      curve.push(equity);
+      if (!ruined && dd >= ruinThresh) { ruined = true; ruinCount++; }
+    }
+
+    allCurves.push(curve);
+    finalEquities.push(equity);
+    maxDDs.push(maxDD * 100);
+  }
+
+  finalEquities.sort((a, b) => a - b);
+  maxDDs.sort((a, b) => a - b);
+
+  // Percentile curves
+  function pctCurve(pct) {
+    const idx = Math.floor(pct * (simCount - 1));
+    // Sort curves by final equity and pick the idx-th
+    const sorted = [...allCurves].sort((a, b) => a[a.length-1] - b[b.length-1]);
+    return sorted[idx];
+  }
+
+  const p5Curve     = pctCurve(0.05);
+  const p25Curve    = pctCurve(0.25);
+  const p50Curve    = pctCurve(0.50);
+  const p75Curve    = pctCurve(0.75);
+  const p95Curve    = pctCurve(0.95);
+
+  const pct = (p, arr) => arr[Math.floor(p * (arr.length - 1))];
+  const ruin = (ruinCount / simCount * 100);
+
+  // ── KPI Row ──
+  const kpiEl = document.getElementById('mcKpiRow');
+  const toEqPct = v => ((v - 1) * 100).toFixed(1) + '%';
+  const kpis = [
+    { label: 'Median Final Equity', val: toEqPct(pct(0.5, finalEquities)), color: 'var(--gold)', sub: 'P50' },
+    { label: 'Best Case (P95)', val: toEqPct(pct(0.95, finalEquities)), color: 'var(--green)', sub: 'Top 5%' },
+    { label: 'Worst Case (P5)', val: toEqPct(pct(0.05, finalEquities)), color: 'var(--red)', sub: 'Bottom 5%' },
+    { label: 'Ruin Probability', val: ruin.toFixed(2) + '%', color: ruin > 10 ? 'var(--red)' : ruin > 3 ? '#F6AD55' : 'var(--green)', sub: `DD ≥ ${(ruinThresh*100).toFixed(0)}%` },
+    { label: 'Median Max DD', val: pct(0.5, maxDDs).toFixed(1) + '%', color: 'var(--muted)', sub: 'P50 drawdown' },
+    { label: 'Worst Max DD (P95)', val: pct(0.95, maxDDs).toFixed(1) + '%', color: 'var(--red)', sub: 'Top 5% worst' },
+  ];
+  kpiEl.innerHTML = kpis.map(k => `
+    <div class="kpi-card" style="padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${k.label}</div>
+      <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:${k.color}">${k.val}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${k.sub}</div>
+    </div>`).join('');
+
+  // ── Equity Curve Chart ──
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#6B7394' : '#8088A6';
+  const labels = Array.from({length: tradeCount + 1}, (_, i) => i);
+
+  // Sample subset of curves for background (up to 200 lines)
+  const sampleStep = Math.max(1, Math.floor(simCount / 200));
+  const sampledCurves = allCurves.filter((_, i) => i % sampleStep === 0);
+
+  const eqCanvas = document.getElementById('mcEquityCanvas');
+  if (mcEquityChart) { mcEquityChart.destroy(); mcEquityChart = null; }
+
+  // Draw fan manually on canvas for performance
+  const ctx = eqCanvas.getContext('2d');
+  eqCanvas.width = eqCanvas.offsetWidth * window.devicePixelRatio || 900;
+  eqCanvas.height = 280 * window.devicePixelRatio;
+  eqCanvas.style.height = '280px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  const W = eqCanvas.offsetWidth || 900;
+  const H = 280;
+  const PAD = { top: 20, right: 20, bottom: 36, left: 64 };
+  const chartW = W - PAD.left - PAD.right;
+  const chartH = H - PAD.top - PAD.bottom;
+
+  // Determine Y range
+  const allVals = [p5Curve, p95Curve].flat();
+  let yMin = Math.min(...allVals);
+  let yMax = Math.max(...allVals);
+  const yPad = (yMax - yMin) * 0.08 || 0.1;
+  yMin -= yPad; yMax += yPad;
+
+  function xPos(i) { return PAD.left + (i / tradeCount) * chartW; }
+  function yPos(v) { return PAD.top + chartH - ((v - yMin) / (yMax - yMin)) * chartH; }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.top + (i / 4) * chartH;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + chartW, y); ctx.stroke();
+    const val = yMax - (i / 4) * (yMax - yMin);
+    ctx.fillStyle = textColor;
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(((val - 1) * 100).toFixed(0) + '%', PAD.left - 8, y + 4);
+  }
+  // X axis labels
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const xi = Math.round((i / 4) * tradeCount);
+    const x = xPos(xi);
+    ctx.fillStyle = textColor;
+    ctx.fillText(xi, x, H - PAD.bottom + 16);
+  }
+  // Axis line
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, PAD.top + chartH); ctx.lineTo(PAD.left + chartW, PAD.top + chartH); ctx.stroke();
+
+  // Fan: fill between P25-P75
+  ctx.beginPath();
+  for (let i = 0; i <= tradeCount; i++) ctx.lineTo(xPos(i), yPos(p75Curve[i]));
+  for (let i = tradeCount; i >= 0; i--) ctx.lineTo(xPos(i), yPos(p25Curve[i]));
+  ctx.closePath();
+  ctx.fillStyle = isDark ? 'rgba(201,168,76,0.10)' : 'rgba(201,168,76,0.12)';
+  ctx.fill();
+
+  // Fan: fill between P5-P95 (lighter)
+  ctx.beginPath();
+  for (let i = 0; i <= tradeCount; i++) ctx.lineTo(xPos(i), yPos(p95Curve[i]));
+  for (let i = tradeCount; i >= 0; i--) ctx.lineTo(xPos(i), yPos(p5Curve[i]));
+  ctx.closePath();
+  ctx.fillStyle = isDark ? 'rgba(201,168,76,0.04)' : 'rgba(201,168,76,0.06)';
+  ctx.fill();
+
+  // P5 line (red)
+  function drawLine(curve, color, width, dash = []) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash);
+    for (let i = 0; i <= tradeCount; i++) {
+      if (i === 0) ctx.moveTo(xPos(i), yPos(curve[i]));
+      else ctx.lineTo(xPos(i), yPos(curve[i]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  drawLine(p95Curve, isDark ? '#3BBF7E' : '#2FA86A', 1.5, [4, 3]);
+  drawLine(p5Curve,  isDark ? '#E05A5A' : '#D14F4F', 1.5, [4, 3]);
+  drawLine(p25Curve, isDark ? 'rgba(201,168,76,0.5)' : 'rgba(184,146,74,0.5)', 1, [2,3]);
+  drawLine(p75Curve, isDark ? 'rgba(201,168,76,0.5)' : 'rgba(184,146,74,0.5)', 1, [2,3]);
+  drawLine(p50Curve, isDark ? '#C9A84C' : '#B8924A', 2.5);
+
+  // Baseline at 1.0
+  const baseY = yPos(1.0);
+  ctx.beginPath();
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 4]);
+  ctx.moveTo(PAD.left, baseY); ctx.lineTo(PAD.left + chartW, baseY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── DD Distribution Chart (bar histogram) ──
+  const ddCanvas = document.getElementById('mcDDCanvas');
+  if (mcDDChart) { mcDDChart.destroy(); mcDDChart = null; }
+  const ddCtx = ddCanvas.getContext('2d');
+  ddCanvas.width = (ddCanvas.offsetWidth || 440) * window.devicePixelRatio;
+  ddCanvas.height = 220 * window.devicePixelRatio;
+  ddCanvas.style.height = '220px';
+  ddCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  const DW = ddCanvas.offsetWidth || 440;
+  const DH = 220;
+  const DP = { top: 16, right: 16, bottom: 36, left: 44 };
+  const dChartW = DW - DP.left - DP.right;
+  const dChartH = DH - DP.top - DP.bottom;
+
+  // Build histogram bins (0-100% DD in steps)
+  const maxDD_val = Math.ceil(pct(0.99, maxDDs));
+  const binCount = Math.min(20, maxDD_val);
+  const binSize = maxDD_val / binCount;
+  const bins = Array(binCount).fill(0);
+  maxDDs.forEach(d => {
+    const bi = Math.min(binCount - 1, Math.floor(d / binSize));
+    bins[bi]++;
+  });
+  const maxBin = Math.max(...bins);
+  const ruinBinStart = Math.floor(ruinThresh * 100 / binSize);
+
+  ddCtx.clearRect(0, 0, DW, DH);
+
+  // Grid
+  for (let i = 0; i <= 4; i++) {
+    const y = DP.top + (i / 4) * dChartH;
+    ddCtx.strokeStyle = gridColor; ddCtx.lineWidth = 1;
+    ddCtx.beginPath(); ddCtx.moveTo(DP.left, y); ddCtx.lineTo(DP.left + dChartW, y); ddCtx.stroke();
+    ddCtx.fillStyle = textColor; ddCtx.font = '10px Inter'; ddCtx.textAlign = 'right';
+    ddCtx.fillText(Math.round((1 - i/4) * maxBin / simCount * 100) + '%', DP.left - 4, y + 4);
+  }
+
+  const barW = dChartW / binCount;
+  bins.forEach((count, i) => {
+    const bh = (count / maxBin) * dChartH;
+    const x = DP.left + i * barW;
+    const y = DP.top + dChartH - bh;
+    ddCtx.fillStyle = i >= ruinBinStart
+      ? (isDark ? 'rgba(224,90,90,0.65)' : 'rgba(209,79,79,0.65)')
+      : (isDark ? 'rgba(201,168,76,0.55)' : 'rgba(184,146,74,0.55)');
+    ddCtx.fillRect(x + 1, y, barW - 2, bh);
+  });
+
+  // X labels
+  ddCtx.fillStyle = textColor; ddCtx.font = '10px Inter'; ddCtx.textAlign = 'center';
+  [0, 0.25, 0.5, 0.75, 1].forEach(p => {
+    const x = DP.left + p * dChartW;
+    ddCtx.fillText((p * maxDD_val).toFixed(0) + '%', x, DH - DP.bottom + 14);
+  });
+  ddCtx.fillStyle = textColor; ddCtx.font = '10px Inter'; ddCtx.textAlign = 'center';
+  ddCtx.fillText('Max Drawdown', DP.left + dChartW / 2, DH - 4);
+
+  // Ruin line
+  const ruinX = DP.left + (ruinThresh * 100 / maxDD_val) * dChartW;
+  if (ruinX < DP.left + dChartW) {
+    ddCtx.strokeStyle = isDark ? '#E05A5A' : '#D14F4F';
+    ddCtx.lineWidth = 1.5;
+    ddCtx.setLineDash([4, 3]);
+    ddCtx.beginPath(); ddCtx.moveTo(ruinX, DP.top); ddCtx.lineTo(ruinX, DP.top + dChartH); ddCtx.stroke();
+    ddCtx.setLineDash([]);
+    ddCtx.fillStyle = isDark ? '#E05A5A' : '#D14F4F';
+    ddCtx.font = '10px Inter'; ddCtx.textAlign = 'left';
+    ddCtx.fillText('Ruin', ruinX + 3, DP.top + 12);
+  }
+
+  // ── Percentile Table ──
+  const pts = [1, 5, 10, 25, 50, 75, 90, 95, 99];
+  const tableEl = document.getElementById('mcPercentileTable');
+  tableEl.innerHTML = `
+  <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr style="border-bottom:1px solid var(--border)">
+        <th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Percentile</th>
+        <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Final Equity</th>
+        <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Return</th>
+        <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Max DD</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${pts.map(p => {
+        const eq = pct(p / 100, finalEquities);
+        const dd = pct(p / 100, maxDDs);
+        const ret = ((eq - 1) * 100);
+        const retColor = ret >= 0 ? 'var(--green)' : 'var(--red)';
+        const isMedian = p === 50;
+        return `<tr style="border-bottom:1px solid var(--border);${isMedian ? 'background:rgba(201,168,76,0.07)' : ''}">
+          <td style="padding:8px 12px;font-family:var(--font-mono);font-weight:${isMedian?700:400};color:${isMedian?'var(--gold)':'var(--text)'}">P${p}</td>
+          <td style="text-align:right;padding:8px 12px;font-family:var(--font-mono);color:var(--text)">${eq.toFixed(3)}x</td>
+          <td style="text-align:right;padding:8px 12px;font-family:var(--font-mono);color:${retColor}">${ret >= 0 ? '+' : ''}${ret.toFixed(1)}%</td>
+          <td style="text-align:right;padding:8px 12px;font-family:var(--font-mono);color:var(--muted)">${dd.toFixed(1)}%</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+
+  document.getElementById('mcResults').style.display = 'block';
+  document.getElementById('mcEmpty').style.display = 'none';
+}
 
 
 </script>
