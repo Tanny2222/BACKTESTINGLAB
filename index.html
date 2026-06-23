@@ -1809,7 +1809,24 @@
     </div>
 
     <div id="mcResults" style="display:none">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:1.5rem" id="mcKpiRow"></div>
+      <!-- Scenario Tabs -->
+      <div style="margin-bottom:1.5rem">
+        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+          <button id="mcTabBest" onclick="mcSwitchTab('best')"
+            style="padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:var(--font-body);cursor:pointer;border:1px solid #3BBF7E;background:rgba(59,191,126,0.15);color:#3BBF7E;transition:all 0.15s">
+            🚀 Best Case (P95)
+          </button>
+          <button id="mcTabMedian" onclick="mcSwitchTab('median')"
+            style="padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:var(--font-body);cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all 0.15s">
+            ⚖️ Median Case (P50)
+          </button>
+          <button id="mcTabWorst" onclick="mcSwitchTab('worst')"
+            style="padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:var(--font-body);cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all 0.15s">
+            ⚠️ Worst Case (P5)
+          </button>
+        </div>
+        <div id="mcKpiRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px"></div>
+      </div>
       <div class="chart-card" style="margin-bottom:1.5rem">
         <div class="stat-section-title">Equity Curve Fan Chart <span style="color:var(--muted);font-weight:400;font-size:11px;margin-left:8px">เส้นสีทอง = Median · เขียว = P95 · แดง = P5</span></div>
         <canvas id="mcEquityCanvas" height="280" style="width:100%;display:block"></canvas>
@@ -3784,30 +3801,46 @@ function calcRisk() {
           </tr>
         </thead>
         <tbody>
-          ${[
-            { label: 'Conservative', risk: safeRisk_conservative, color: 'var(--green)' },
-            { label: 'Moderate',     risk: safeRisk_moderate,     color: 'var(--gold)' },
-            { label: 'Aggressive',   risk: safeRisk_aggressive,   color: '#F6AD55' },
-            { label: 'Your Setting', risk: effectiveRisk,          color: riskColor },
-          ].map(row => {
-            const streak = Math.floor(maxDD / row.risk);
-            const dailyRiskFromRow = row.risk * maxTrades;
-            const daysBeforeBlowup = dailyRiskFromRow > 0 ? Math.floor(maxDD / dailyRiskFromRow) : 0;
-            const isCurrent = row.label === 'Your Setting';
-            const rowDollar = balance * row.risk / 100;
-            return `<tr style="border-bottom:1px solid var(--border);background:${isCurrent ? 'rgba(255,255,255,0.03)' : 'transparent'}">
-              <td style="padding:10px 14px;font-weight:${isCurrent?700:400};color:${row.color}">${row.label}${isCurrent?' ◀':''}</td>
-              <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:${row.color}">${fmtPct(row.risk)}</td>
-              ${hasBalance ? `<td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:${row.color}">${fmtMoney(rowDollar)}</td>` : ''}
-              <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:var(--text)">${streak} ไม้</td>
-              <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:var(--text)">${daysBeforeBlowup} วัน</td>
-              <td style="text-align:center;padding:10px 14px">
-                <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:${row.color}22;color:${row.color}">
-                  ${row.risk <= safeRisk_conservative ? '✓ SAFE' : row.risk <= safeRisk_moderate ? '~ OK' : row.risk <= safeRisk_aggressive ? '⚠ HIGH' : '✕ DANGER'}
-                </span>
-              </td>
-            </tr>`;
-          }).join('')}
+          ${(() => {
+            // Recommended risk: same logic as the advice section below
+            const recommendedRisk = hasData
+              ? (ev_R > 0 ? Math.min(effectiveRisk, safeRisk_moderate) : safeRisk_conservative)
+              : null;
+
+            return [
+              { label: 'Conservative',   risk: safeRisk_conservative, color: 'var(--green)' },
+              { label: 'Moderate',       risk: safeRisk_moderate,     color: 'var(--gold)' },
+              { label: 'Aggressive',     risk: safeRisk_aggressive,   color: '#F6AD55' },
+              { label: 'Most Aggressive', risk: effectiveRisk,         color: riskColor },
+            ].map(row => {
+              const streak = Math.floor(maxDD / row.risk);
+              const dailyRiskFromRow = row.risk * maxTrades;
+              const daysBeforeBlowup = dailyRiskFromRow > 0 ? Math.floor(maxDD / dailyRiskFromRow) : 0;
+              const rowDollar = balance * row.risk / 100;
+              // Highlight the row whose risk matches the recommended risk
+              const isRecommended = recommendedRisk !== null && Math.abs(row.risk - recommendedRisk) < 0.0001;
+              const rowBg = isRecommended
+                ? 'rgba(59,191,126,0.08)'
+                : 'transparent';
+              const borderLeft = isRecommended
+                ? 'border-left:3px solid var(--green);'
+                : 'border-left:3px solid transparent;';
+              return `<tr style="border-bottom:1px solid var(--border);background:${rowBg};${borderLeft}">
+                <td style="padding:10px 14px;font-weight:${isRecommended?700:400};color:${row.color}">
+                  ${row.label}${isRecommended ? ' <span style=\"font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(59,191,126,0.18);color:var(--green);vertical-align:middle\">✦ แนะนำ</span>' : ''}
+                </td>
+                <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:${row.color}">${fmtPct(row.risk)}</td>
+                ${hasBalance ? `<td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:${row.color}">${fmtMoney(rowDollar)}</td>` : ''}
+                <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:var(--text)">${streak} ไม้</td>
+                <td style="text-align:center;padding:10px 14px;font-family:var(--font-mono);color:var(--text)">${daysBeforeBlowup} วัน</td>
+                <td style="text-align:center;padding:10px 14px">
+                  <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:${row.color}22;color:${row.color}">
+                    ${row.risk <= safeRisk_conservative ? '✓ SAFE' : row.risk <= safeRisk_moderate ? '~ OK' : row.risk <= safeRisk_aggressive ? '⚠ HIGH' : '✕ DANGER'}
+                  </span>
+                </td>
+              </tr>`;
+            }).join('');
+          })()}
         </tbody>
       </table>
     </div>
@@ -3898,6 +3931,8 @@ function runMonteCarlo() {
   const allCurves = [];
   const finalEquities = [];
   const maxDDs = [];
+  const allMaxConWins = [];
+  const allMaxConLosses = [];
   let ruinCount = 0;
 
   for (let s = 0; s < simCount; s++) {
@@ -3907,13 +3942,17 @@ function runMonteCarlo() {
     let ruined = false;
     const curve = [1.0];
 
+    let maxConWin = 0, maxConLoss = 0, curConWin = 0, curConLoss = 0;
     for (let t = 0; t < tradeCount; t++) {
       const rr = rrs[Math.floor(Math.random() * rrs.length)];
-      // compound: win/loss as fraction of current equity
       if (rr > 0) {
         equity *= (1 + riskPct * rr);
+        curConWin++; curConLoss = 0;
+        if (curConWin > maxConWin) maxConWin = curConWin;
       } else {
-        equity *= (1 + riskPct * rr); // rr negative → loss
+        equity *= (1 + riskPct * rr);
+        curConLoss++; curConWin = 0;
+        if (curConLoss > maxConLoss) maxConLoss = curConLoss;
       }
       if (equity > peak) peak = equity;
       const dd = (peak - equity) / peak;
@@ -3925,10 +3964,14 @@ function runMonteCarlo() {
     allCurves.push(curve);
     finalEquities.push(equity);
     maxDDs.push(maxDD * 100);
+    allMaxConWins.push(maxConWin);
+    allMaxConLosses.push(maxConLoss);
   }
 
   finalEquities.sort((a, b) => a - b);
   maxDDs.sort((a, b) => a - b);
+  allMaxConWins.sort((a, b) => a - b);
+  allMaxConLosses.sort((a, b) => a - b);
 
   // Percentile curves
   function pctCurve(pct) {
@@ -3947,23 +3990,93 @@ function runMonteCarlo() {
   const pct = (p, arr) => arr[Math.floor(p * (arr.length - 1))];
   const ruin = (ruinCount / simCount * 100);
 
-  // ── KPI Row ──
-  const kpiEl = document.getElementById('mcKpiRow');
+  // ── Winrate from source data ──
+  const rrWins = rrs.filter(r => r > 0).length;
+  const rrWinrate = (rrWins / rrs.length * 100);
+
+  // ── Build scenario data sets ──
   const toEqPct = v => ((v - 1) * 100).toFixed(1) + '%';
-  const kpis = [
-    { label: 'Median Final Equity', val: toEqPct(pct(0.5, finalEquities)), color: 'var(--gold)', sub: 'P50' },
-    { label: 'Best Case (P95)', val: toEqPct(pct(0.95, finalEquities)), color: 'var(--green)', sub: 'Top 5%' },
-    { label: 'Worst Case (P5)', val: toEqPct(pct(0.05, finalEquities)), color: 'var(--red)', sub: 'Bottom 5%' },
-    { label: 'Ruin Probability', val: ruin.toFixed(2) + '%', color: ruin > 10 ? 'var(--red)' : ruin > 3 ? '#F6AD55' : 'var(--green)', sub: `DD ≥ ${(ruinThresh*100).toFixed(0)}%` },
-    { label: 'Median Max DD', val: pct(0.5, maxDDs).toFixed(1) + '%', color: 'var(--muted)', sub: 'P50 drawdown' },
-    { label: 'Worst Max DD (P95)', val: pct(0.95, maxDDs).toFixed(1) + '%', color: 'var(--red)', sub: 'Top 5% worst' },
-  ];
-  kpiEl.innerHTML = kpis.map(k => `
-    <div class="kpi-card" style="padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${k.label}</div>
-      <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:${k.color}">${k.val}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">${k.sub}</div>
-    </div>`).join('');
+  const toSign  = v => { const r = ((v-1)*100); return (r>=0?'+':'')+r.toFixed(1)+'%'; };
+
+  window._mcScenarios = {
+    best: {
+      accentColor: '#3BBF7E',
+      label: '🚀 Best Case — P95',
+      items: [
+        { label: 'Final Equity Return', val: toSign(pct(0.95, finalEquities)), color: '#3BBF7E', sub: 'P95 simulation' },
+        { label: 'Winrate (จาก Backtest)', val: rrWinrate.toFixed(1) + '%', color: rrWinrate >= 50 ? '#3BBF7E' : '#F6AD55', sub: rrs.length + ' trades' },
+        { label: 'Max DD พบในกรณีนี้', val: pct(0.05, maxDDs).toFixed(1) + '%', color: '#3BBF7E', sub: 'P5 max drawdown' },
+        { label: 'Max Con. Win', val: pct(0.95, allMaxConWins).toFixed(0) + ' ไม้', color: '#3BBF7E', sub: 'winning streak สูงสุด' },
+        { label: 'Max Con. Loss', val: pct(0.05, allMaxConLosses).toFixed(0) + ' ไม้', color: '#3BBF7E', sub: 'losing streak ต่ำสุด' },
+        { label: 'Ruin Probability', val: ruin.toFixed(2) + '%', color: ruin > 10 ? 'var(--red)' : ruin > 3 ? '#F6AD55' : '#3BBF7E', sub: `DD ≥ ${(ruinThresh*100).toFixed(0)}%` },
+      ]
+    },
+    median: {
+      accentColor: '#C9A84C',
+      label: '⚖️ Median Case — P50',
+      items: [
+        { label: 'Final Equity Return', val: toSign(pct(0.5, finalEquities)), color: '#C9A84C', sub: 'P50 simulation' },
+        { label: 'Winrate (จาก Backtest)', val: rrWinrate.toFixed(1) + '%', color: rrWinrate >= 50 ? '#3BBF7E' : '#F6AD55', sub: rrs.length + ' trades' },
+        { label: 'Max DD พบในกรณีนี้', val: pct(0.5, maxDDs).toFixed(1) + '%', color: '#C9A84C', sub: 'P50 max drawdown' },
+        { label: 'Max Con. Win', val: pct(0.5, allMaxConWins).toFixed(0) + ' ไม้', color: '#3BBF7E', sub: 'winning streak กลาง' },
+        { label: 'Max Con. Loss', val: pct(0.5, allMaxConLosses).toFixed(0) + ' ไม้', color: 'var(--muted)', sub: 'losing streak กลาง' },
+        { label: 'Ruin Probability', val: ruin.toFixed(2) + '%', color: ruin > 10 ? 'var(--red)' : ruin > 3 ? '#F6AD55' : '#3BBF7E', sub: `DD ≥ ${(ruinThresh*100).toFixed(0)}%` },
+      ]
+    },
+    worst: {
+      accentColor: '#E05A5A',
+      label: '⚠️ Worst Case — P5',
+      items: [
+        { label: 'Final Equity Return', val: toSign(pct(0.05, finalEquities)), color: '#E05A5A', sub: 'P5 simulation' },
+        { label: 'Winrate (จาก Backtest)', val: rrWinrate.toFixed(1) + '%', color: rrWinrate >= 50 ? '#3BBF7E' : '#F6AD55', sub: rrs.length + ' trades' },
+        { label: 'Max DD พบในกรณีนี้', val: pct(0.95, maxDDs).toFixed(1) + '%', color: '#E05A5A', sub: 'P95 max drawdown' },
+        { label: 'Max Con. Win', val: pct(0.05, allMaxConWins).toFixed(0) + ' ไม้', color: 'var(--muted)', sub: 'winning streak ต่ำสุด' },
+        { label: 'Max Con. Loss', val: pct(0.95, allMaxConLosses).toFixed(0) + ' ไม้', color: '#E05A5A', sub: 'losing streak สูงสุด' },
+        { label: 'Ruin Probability', val: ruin.toFixed(2) + '%', color: ruin > 10 ? 'var(--red)' : ruin > 3 ? '#F6AD55' : '#3BBF7E', sub: `DD ≥ ${(ruinThresh*100).toFixed(0)}%` },
+      ]
+    }
+  };
+
+  window.mcSwitchTab = function(tab) {
+    const scenario = window._mcScenarios[tab];
+    if (!scenario) return;
+
+    // Update tab button styles
+    ['best','median','worst'].forEach(t => {
+      const btn = document.getElementById('mcTab' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (!btn) return;
+      if (t === tab) {
+        const c = { best: '#3BBF7E', median: '#C9A84C', worst: '#E05A5A' }[t];
+        btn.style.borderColor = c;
+        btn.style.background = c + '22';
+        btn.style.color = c;
+      } else {
+        btn.style.borderColor = 'var(--border)';
+        btn.style.background = 'var(--surface2)';
+        btn.style.color = 'var(--muted)';
+      }
+    });
+
+    // Render KPI cards
+    const kpiEl = document.getElementById('mcKpiRow');
+    kpiEl.innerHTML = scenario.items.map(k => {
+      const isFeatured = k.label === 'Final Equity Return';
+      return `
+      <div class="kpi-card" style="
+        padding:${isFeatured ? '20px 24px' : '14px 16px'};
+        border-color:${isFeatured ? scenario.accentColor : scenario.accentColor + '33'};
+        ${isFeatured ? 'grid-column: span 2; background: ' + scenario.accentColor + '0d;' : ''}
+        box-shadow:${isFeatured ? '0 0 20px ' + scenario.accentColor + '22' : 'none'};
+      ">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${isFeatured ? scenario.accentColor : 'var(--muted)'};margin-bottom:${isFeatured ? '10px' : '6px'}">${k.label}</div>
+        <div style="font-family:var(--font-mono);font-size:${isFeatured ? '28px' : '22px'};font-weight:700;color:${k.color};line-height:1;white-space:nowrap;overflow:hidden;text-overflow:clip">${k.val}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:${isFeatured ? '8px' : '4px'}">${k.sub}</div>
+      </div>`;
+    }).join('');
+  };
+
+  // Default: show median tab
+  mcSwitchTab('median');
 
   // ── Equity Curve Chart ──
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
