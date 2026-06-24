@@ -1323,29 +1323,29 @@
   .chart-card-title { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .chart-card-title .badge { font-size: 11px; font-family: var(--font-mono); background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 1px 8px; color: var(--text); font-weight: 600; letter-spacing: 0; text-transform: none; }
   .chart-svg { width: 100%; overflow: visible; }
-  .donut-wrap { display: flex; align-items: center; gap: 20px; }
-  .donut-legend { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-  .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-  .donut-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .donut-legend-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .donut-legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .donut-legend-label { color: var(--muted); flex: 1; }
   .donut-legend-val { font-family: var(--font-mono); font-weight: 600; }
-  .tag-stat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .tag-stat-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .tag-stat-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tag-stat-table th { text-align: left; padding: 10px 14px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
   .tag-stat-table th:not(:first-child) { text-align: right; }
-  .tag-stat-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .tag-stat-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); }
   .tag-stat-table td:not(:first-child) { text-align: right; font-family: var(--font-mono); }
   .tag-stat-table tbody tr:last-child td { border-bottom: none; }
   .tag-stat-table tbody tr:hover { background: var(--surface2); }
-  .tag-pill-sm { display: inline-block; padding: 2px 8px; border-radius: 99px; background: var(--surface2); border: 1px solid var(--border); font-size: 11px; color: var(--text); }
-  .rr-bar-wrap { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
-  .rr-bar-track { width: 60px; height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .tag-pill-sm { display: inline-block; padding: 4px 12px; border-radius: 99px; background: var(--surface2); border: 1px solid var(--border); font-size: 13px; color: var(--text); }
+  .rr-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  .rr-bar-track { width: 80px; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
   .rr-bar-fill { height: 100%; border-radius: 99px; }
-  .session-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-  .session-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
-  .session-card-name { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-  .session-card-wr { font-family: var(--font-mono); font-size: 18px; font-weight: 700; line-height: 1; margin: 4px 0; }
-  .session-card-sub { font-size: 10px; color: var(--muted); }
-  .session-bar-track { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .session-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  .session-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+  .session-card-name { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .session-card-wr { font-family: var(--font-mono); font-size: 32px; font-weight: 700; line-height: 1; margin: 6px 0; }
+  .session-card-sub { font-size: 12px; color: var(--muted); }
+  .session-bar-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 10px; }
   .session-bar-fill { height: 100%; border-radius: 99px; }
   .stats-empty { text-align: center; padding: 5rem 2rem; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .stats-empty svg { width: 44px; height: 44px; stroke: var(--muted); fill: none; stroke-width: 1.5; opacity: .4; }
@@ -3200,7 +3200,8 @@ function renderStats() {
   const dayData = days.map((d,i) => {
     const dt = t.filter(x => {
       if (!x.tradeDate) return false;
-      return new Date(x.tradeDate).getDay() === i;
+      const [yr,mo,dy] = x.tradeDate.split('-').map(Number);
+      return new Date(yr, mo-1, dy).getDay() === i;
     });
     const dw = dt.filter(x=>x.status==='WIN').length;
     const dl = dt.filter(x=>x.status==='LOSS').length;
@@ -3220,6 +3221,12 @@ function renderStats() {
     const r = parseFloat(x.rr);
     if (!isNaN(r)) hourMap[h].rr += r;
   });
+
+  const hourRows = Object.entries(hourMap).map(([h, v]) => {
+    const d = v.w + v.l;
+    const wr = d > 0 ? v.w / d * 100 : 0;
+    return { h: parseInt(h), label: h.padStart(2,'0') + ':00', w: v.w, l: v.l, d, wr, trr: v.rr, avg: d > 0 ? v.rr / d : 0 };
+  }).sort((a, b) => a.h - b.h);
 
   // ── By Tag ──
   const tagMap = {};
@@ -3257,6 +3264,46 @@ function renderStats() {
     count: rrAll.filter(v => v > b.min && v <= b.max).length
   }));
 
+  // ── Entry Time table + charts ──
+  function entryTimeSection() {
+    if (!hourRows.length) return '<div style="color:var(--muted);font-size:12px;padding:0.5rem 0">ไม่มีข้อมูล Entry Time</div>';
+
+    const maxAbsRR = Math.max(...hourRows.map(r => Math.abs(r.trr)), 0.01);
+
+    // ── Table ──
+    const table = `<table class="tag-stat-table">
+      <thead><tr>
+        <th>Hour</th><th>Trades</th><th>W</th><th>L</th><th>WR%</th><th>Total RR</th><th>Avg RR</th>
+      </tr></thead>
+      <tbody>${hourRows.map(r => {
+        const barW = Math.abs(r.trr) / maxAbsRR * 100;
+        const bCol = r.trr >= 0 ? 'var(--green)' : 'var(--red)';
+        const nextH = String(r.h + 1).padStart(2,'0') + ':00';
+        const rangeLabel = r.label + ' – ' + nextH;
+        return `<tr>
+          <td style="font-family:var(--font-mono);font-weight:600;color:var(--gold);white-space:nowrap">${rangeLabel}</td>
+          <td>${r.d}</td>
+          <td style="color:var(--green)">${r.w}</td>
+          <td style="color:var(--red)">${r.l}</td>
+          <td style="color:${r.wr>=50?'var(--green)':'var(--red)'}">${r.d>0?Math.round(r.wr)+'%':'—'}</td>
+          <td>
+            <div class="rr-bar-wrap">
+              <div class="rr-bar-track"><div class="rr-bar-fill" style="width:${barW}%;background:${bCol}"></div></div>
+              <span style="color:${bCol}">${fmt(r.trr)}</span>
+            </div>
+          </td>
+          <td style="color:${r.avg>=0?'var(--green)':'var(--red)'}">${r.d>0?fmt(r.avg):'—'}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+
+    return `
+      <div class="chart-card">
+        <div class="chart-card-title">Entry Time Breakdown <span class="badge">${hourRows.length} hours</span></div>
+        ${table}
+      </div>`;
+  }
+
   // ────────────────── RENDER ──────────────────
 
   // Helper: SVG bar chart (horizontal label bottom)
@@ -3288,12 +3335,11 @@ function renderStats() {
 
   // Helper: Donut
   function donut(slices, size=120) {
-    const r = 38, cx=size/2, cy=size/2, stroke=14;
+    const r = size * 0.30, cx=size/2, cy=size/2, stroke=size * 0.11;
     const total = slices.reduce((a,b)=>a+b.v,0);
     if (!total) return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${stroke}"/></svg>`;
     let offset = -90;
     let arcs = '';
-    const circ = 2 * Math.PI * r;
     slices.forEach(sl => {
       const deg = sl.v / total * 360;
       const rad = offset * Math.PI / 180;
@@ -3305,11 +3351,13 @@ function renderStats() {
       offset += deg;
     });
     const pctMain = Math.round(slices[0].v / total * 100);
+    const fsPct = Math.round(size * 0.094);
+    const fsLabel = Math.round(size * 0.056);
     return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="${stroke}"/>
       ${arcs}
-      <text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="15" font-weight="700" fill="var(--text)">${pctMain}%</text>
-      <text x="${cx}" y="${cy+12}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="9" fill="var(--muted)">WIN</text>
+      <text x="${cx}" y="${cy-size*0.025}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="${fsPct}" font-weight="700" fill="var(--text)">${pctMain}%</text>
+      <text x="${cx}" y="${cy+size*0.075}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="${fsLabel}" fill="var(--muted)">WIN</text>
     </svg>`;
   }
 
@@ -3355,14 +3403,54 @@ function renderStats() {
     if (!active.length) return '<div style="color:var(--muted);font-size:12px;padding:1rem 0">ไม่มีข้อมูล Date</div>';
     return barChart(
       dayData.map(d => ({ label: d.d, value: d.trr, color: d.trr >= 0 ? 'var(--green)' : 'var(--red)' })),
-      420, 130, v => v>=0 ? 'var(--green)' : 'var(--red)'
+      420, 160, v => v>=0 ? 'var(--green)' : 'var(--red)'
     );
+  }
+
+  // ── Winrate by Day of Week chart ──
+  function dowWinrateChart() {
+    const active = dayData.filter(d => d.n > 0);
+    if (!active.length) return '<div style="color:var(--muted);font-size:12px;padding:1rem 0">ไม่มีข้อมูล Date</div>';
+    const W = 420, H = 160;
+    const pad = { t: 10, r: 4, b: 38, l: 28 };
+    const cw = W - pad.l - pad.r;
+    const ch = H - pad.t - pad.b;
+    const bw = Math.floor(cw / dayData.length) - 4;
+    // Draw 50% reference line
+    const y50 = pad.t + ch - (50 / 100) * ch;
+    let bars = `<line x1="${pad.l}" y1="${y50.toFixed(1)}" x2="${W - pad.r}" y2="${y50.toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>`;
+    // Y-axis ticks
+    [0, 50, 100].forEach(v => {
+      const y = pad.t + ch - (v / 100) * ch;
+      bars += `<text x="${(pad.l - 4).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--muted)">${v}%</text>`;
+    });
+    dayData.forEach((d, i) => {
+      const wr = d.wr; // 0-100
+      const hasData = (d.w + d.l) > 0;
+      const bh = hasData ? Math.max(3, (wr / 100) * ch) : 0;
+      const x = pad.l + i * (cw / dayData.length) + (cw / dayData.length - bw) / 2;
+      const y = pad.t + ch - bh;
+      const col = !hasData ? 'var(--border)' : wr >= 50 ? 'var(--green)' : 'var(--red)';
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="0.85"/>`;
+      if (hasData) {
+        bars += `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 3).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${Math.round(wr)}%</text>`;
+      }
+      bars += `<text x="${(x + bw / 2).toFixed(1)}" y="${(pad.t + ch + 16).toFixed(1)}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="9" fill="var(--muted)">${d.d}</text>`;
+      // W/L count below day label
+      if (hasData) {
+        bars += `<text x="${(x + bw / 2).toFixed(1)}" y="${(pad.t + ch + 26).toFixed(1)}" text-anchor="middle" font-family="'Inter',sans-serif" font-size="8" fill="var(--muted)" opacity="0.7">${d.w}W/${d.l}L</text>`;
+      }
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+      <line x1="${pad.l}" y1="${pad.t + ch}" x2="${W - pad.r}" y2="${pad.t + ch}" stroke="var(--border)" stroke-width="1"/>
+      ${bars}
+    </svg>`;
   }
 
   // ── RR Distribution chart ──
   function distChart() {
     const maxC = Math.max(...distData.map(d=>d.count), 1);
-    const W=420, H=120, pad={t:10,r:4,b:32,l:4};
+    const W=420, H=160, pad={t:10,r:4,b:32,l:4};
     const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
     const bw = Math.floor(cw/distData.length)-4;
     let bars = '';
@@ -3513,7 +3601,7 @@ function renderStats() {
             {v:wins.length, color:'var(--green)'},
             {v:losses.length, color:'var(--red)'},
             {v:bes.length, color:'var(--gold)'}
-          ], 160)}
+          ], 220)}
           <div class="donut-legend">
             <div class="donut-legend-item">
               <div class="donut-legend-dot" style="background:var(--green)"></div>
@@ -3536,17 +3624,30 @@ function renderStats() {
     </div>
   </div>
 
+  <!-- Tags -->
+  ${tagRows.length ? `<div>
+    <div class="stat-section-title">Performance by SET UP</div>
+    <div class="chart-card">
+      <div class="chart-card-title">SET UP Breakdown <span class="badge">${tagRows.length} set ups</span></div>
+      ${tagTable()}
+    </div>
+  </div>` : ''}
+
   <!-- RR Distribution + Day of Week -->
   <div>
     <div class="stat-section-title">Distribution & Day of Week</div>
-    <div class="charts-row col2">
+    <div class="charts-row col3">
       <div class="chart-card">
-        <div class="chart-card-title">RR Distribution <span class="badge">${rrAll.length} trades</span></div>
-        ${distChart()}
+        <div class="chart-card-title">Winrate by Day of Week</div>
+        ${dowWinrateChart()}
       </div>
       <div class="chart-card">
         <div class="chart-card-title">Total RR by Day of Week</div>
         ${dowChart()}
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">RR Distribution <span class="badge">${rrAll.length} trades</span></div>
+        ${distChart()}
       </div>
     </div>
   </div>
@@ -3557,14 +3658,11 @@ function renderStats() {
     ${sessCards()}
   </div>
 
-  <!-- Tags -->
-  ${tagRows.length ? `<div>
-    <div class="stat-section-title">Performance by SET UP</div>
-    <div class="chart-card">
-      <div class="chart-card-title">SET UP Breakdown <span class="badge">${tagRows.length} set ups</span></div>
-      ${tagTable()}
-    </div>
-  </div>` : ''}
+  <!-- Entry Time -->
+  <div>
+    <div class="stat-section-title">Performance by Entry Time</div>
+    ${entryTimeSection()}
+  </div>
 
   `;
 }
