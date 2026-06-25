@@ -40,20 +40,22 @@
     --red: #D14F4F;
   }
 
+  html, body {
+    overflow-x: clip;
+    width: 100%;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
     min-height: 100vh;
     transition: background 0.2s, color 0.2s;
+    scrollbar-gutter: stable;
   }
 
   /* ─── Theme toggle ─── */
   .theme-toggle {
-    position: fixed;
-    top: 14px;
-    right: 16px;
-    z-index: 999;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -64,6 +66,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    flex-shrink: 0;
     transition: color 0.15s, border-color 0.15s, background 0.15s;
   }
   .theme-toggle:hover { color: var(--gold); border-color: var(--gold-dim); }
@@ -73,11 +76,60 @@
   html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
   html[data-theme="light"] .theme-toggle .icon-sun { display: block; }
 
+  /* ─── Floating Add Trade FAB ─── */
+  .fab-add-trade {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 998;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #0D0F14;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.45), 0 2px 8px rgba(0,0,0,0.3);
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+  }
+  .fab-add-trade:hover {
+    background: #dbb85a;
+    transform: scale(1.08);
+    box-shadow: 0 6px 28px rgba(201,168,76,0.6), 0 3px 12px rgba(0,0,0,0.35);
+  }
+  .fab-add-trade:active { transform: scale(0.96); opacity: 0.9; }
+  .fab-add-trade svg { width: 22px; height: 22px; stroke: #0D0F14; fill: none; stroke-width: 2.5; flex-shrink: 0; }
+  .fab-add-trade .fab-label {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    color: #0D0F14;
+    white-space: nowrap;
+    max-width: 0;
+    overflow: hidden;
+    transition: max-width 0.25s ease, margin-left 0.25s ease, opacity 0.2s ease;
+    opacity: 0;
+    margin-left: 0;
+  }
+  .fab-add-trade:hover .fab-label {
+    max-width: 100px;
+    opacity: 1;
+    margin-left: 6px;
+  }
+  .fab-add-trade:hover {
+    border-radius: 26px;
+    width: auto;
+    padding: 0 18px 0 14px;
+  }
+
   /* ─── Header ─── */
   header {
     border-bottom: 1px solid var(--border);
     padding: 0.9rem 2rem;
-    padding-right: 3.75rem;
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -95,11 +147,15 @@
     background: var(--bg);
     z-index: 75;
     border-bottom: 1px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
   }
   .tgs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .tgs-card {
     background: var(--surface);
@@ -364,6 +420,42 @@
   .page-view { display: none; }
   .page-view.active { display: block; }
 
+  /* ── Trades page: no page scroll, only table scrolls ── */
+  #pageTrades {
+    display: none;
+    flex-direction: column;
+    height: calc(100vh - var(--header-h, 57px));
+    overflow: hidden;
+  }
+  #pageTrades.active {
+    display: flex;
+  }
+  #pageTrades .trades-goal-section {
+    flex-shrink: 0;
+    position: relative;
+    top: unset;
+  }
+  #pageTrades .toolbar {
+    flex-shrink: 0;
+    position: relative;
+    top: unset;
+  }
+  #pageTrades .table-wrap {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+    overflow: hidden;
+    padding-bottom: var(--header-h, 57px);
+  }
+  #pageTrades .table-scroll-container {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    height: 100%;
+  }
+
   /* ─── Mobile Sidebar Nav ─── */
   .sidebar-overlay {
     display: none;
@@ -626,9 +718,9 @@
   }
 
   .table-scroll-container {
-    max-height: calc(100vh - var(--table-top, 310px) - 60px);
-    overflow-y: auto;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     scrollbar-width: thin;
@@ -652,13 +744,17 @@
 
   .trade-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     background: var(--surface);
     font-size: 13px;
   }
 
   .trade-table th {
     text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 10;
     padding: 10px 12px;
     background: var(--surface2);
     color: var(--muted);
@@ -666,11 +762,9 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
+    box-shadow: inset 0 -1px 0 var(--border);
     white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 10;
   }
   .trade-table th.sortable-th {
     cursor: pointer;
@@ -1522,7 +1616,7 @@
   }
 
   @media (max-width: 768px) {
-    header { padding: 0.7rem 1rem; padding-right: 3rem; gap: 0.75rem; flex-wrap: wrap; }
+    header { padding: 0.7rem 1rem; gap: 0.75rem; flex-wrap: wrap; }
     .stats-bar { display: none; }
     .page-tabs { display: none; }
     .sidebar-nav { display: flex; }
@@ -1544,7 +1638,7 @@
   }
 
   @media (max-width: 480px) {
-    header { padding: 0.6rem 0.75rem; padding-right: 2.75rem; }
+    header { padding: 0.6rem 0.75rem; }
     .logo-sub { display: none; }
     .trades-goal-section { padding: 0.75rem 1rem 0; }
     .header-goal { width: 100%; box-sizing: border-box; }
@@ -1713,11 +1807,6 @@
 </head>
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()" title="สลับธีม">
-  <svg class="icon-moon" viewBox="0 0 16 16"><path d="M14 8.5A6 6 0 116.5 2 5 5 0 0014 8.5z"/></svg>
-  <svg class="icon-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13"/></svg>
-</button>
-
 <header>
   <button class="sidebar-menu-btn" id="sidebarMenuBtn" onclick="openSidebar()" aria-label="เปิดเมนู">
     <svg viewBox="0 0 20 20"><line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="14" x2="17" y2="14"/></svg>
@@ -1739,11 +1828,11 @@
     <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">📊 Statistics</button>
     <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">📋 Trades</button>
     <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">🖼️ Gallery</button>
-    <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">🛡️ Risk Management</button>
+    <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">🛡️ Risk Tools</button>
     <button class="page-tab" id="tabMC" onclick="switchPage('mc')">🎲 Monte Carlo</button>
   </div>
 
-  <!-- ── Script Source Button (right side) ── -->
+  <!-- ── Script Source + Theme Toggle (right side) ── -->
   <div style="display:flex;align-items:center;gap:8px">
     <button class="source-icon-btn" onclick="openScriptModal()" title="จัดการ Script Source" id="sourceChip">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -1751,6 +1840,10 @@
         <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/>
       </svg>
       <span class="source-icon-label" id="sourceChipName">Default</span>
+    </button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="สลับธีม">
+      <svg class="icon-moon" viewBox="0 0 16 16"><path d="M14 8.5A6 6 0 116.5 2 5 5 0 0014 8.5z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13"/></svg>
     </button>
   </div>
 
@@ -1778,90 +1871,13 @@
   <button class="sidebar-nav-item active" id="snav-stats" onclick="switchPage('stats');closeSidebar()"><span class="snav-icon">📊</span> Statistics</button>
   <button class="sidebar-nav-item" id="snav-trades" onclick="switchPage('trades');closeSidebar()"><span class="snav-icon">📋</span> Trades</button>
   <button class="sidebar-nav-item" id="snav-gallery" onclick="switchPage('gallery');closeSidebar()"><span class="snav-icon">🖼️</span> Gallery</button>
-  <button class="sidebar-nav-item" id="snav-risk" onclick="switchPage('risk');closeSidebar()"><span class="snav-icon">🛡️</span> Risk Management</button>
+  <button class="sidebar-nav-item" id="snav-risk" onclick="switchPage('risk');closeSidebar()"><span class="snav-icon">🛡️</span> Risk Tools</button>
   <button class="sidebar-nav-item" id="snav-mc" onclick="switchPage('mc');closeSidebar()"><span class="snav-icon">🎲</span> Monte Carlo</button>
 </nav>
 
 <div id="pageTrades" class="page-view">
 
-<div class="trades-goal-section">
-  <div class="tgs-grid">
 
-    <!-- ── Block 1: Goal Target ── -->
-    <div class="tgs-card tgs-goal" onclick="openTargetModal()" title="แก้ไข Target">
-      <div class="tgs-card-header">
-        <div class="tgs-icon">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><line x1="8" y1="2" x2="8" y2="1"/></svg>
-        </div>
-        <span class="tgs-label">TRADE GOAL</span>
-        <span class="tgs-edit-hint">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.5 2.5l2 2L5 13l-3 1 1-3Z"/></svg>
-        </span>
-      </div>
-
-      <div class="tgs-goal-numbers">
-        <div class="tgs-stat-block">
-          <span class="tgs-big" id="goalDone">0</span>
-          <span class="tgs-unit">trades done</span>
-        </div>
-        <div class="tgs-divider">/</div>
-        <div class="tgs-stat-block">
-          <span class="tgs-big tgs-muted" id="goalTarget">—</span>
-          <span class="tgs-unit">target</span>
-        </div>
-        <div class="tgs-badge-wrap">
-          <span class="goal-remain-badge" id="goalRemainBadge">— left</span>
-        </div>
-      </div>
-
-      <div class="tgs-bar-area">
-        <div class="tgs-bar-labels">
-          <span id="goalSubLabel" style="font-size:11px;color:var(--muted)">0% complete</span>
-          <span class="tgs-pct-right" id="goalPctRight">0%</span>
-        </div>
-        <div class="tgs-bar-track">
-          <div class="tgs-bar-fill" id="goalBarFill" style="width:0%"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Block 2: Win Rate Donut ── -->
-    <div class="tgs-card tgs-wr">
-      <div class="tgs-card-header">
-        <div class="tgs-icon tgs-icon-wr">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="2,12 5,7 8,10 11,4 14,8"/></svg>
-        </div>
-        <span class="tgs-label">WIN RATE</span>
-      </div>
-      <div class="tgs-wr-body">
-        <div class="tgs-donut-wrap">
-          <canvas id="goalWrDonut" width="90" height="90"></canvas>
-          <div class="tgs-donut-center">
-            <span class="tgs-donut-pct" id="goalWrPct">—</span>
-          </div>
-        </div>
-        <div class="tgs-wr-legend">
-          <div class="tgs-wr-row">
-            <span class="tgs-wr-dot" style="background:var(--green)"></span>
-            <span class="tgs-wr-lbl">WIN</span>
-            <span class="tgs-wr-val" id="goalWrWins">0</span>
-          </div>
-          <div class="tgs-wr-row">
-            <span class="tgs-wr-dot" style="background:var(--red)"></span>
-            <span class="tgs-wr-lbl">LOSS</span>
-            <span class="tgs-wr-val" id="goalWrLosses">0</span>
-          </div>
-          <div class="tgs-wr-row">
-            <span class="tgs-wr-dot" style="background:var(--muted)"></span>
-            <span class="tgs-wr-lbl">BE</span>
-            <span class="tgs-wr-val" id="goalWrBe">0</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 <div class="toolbar">
   <button class="btn btn-primary" onclick="openAddModal()">
@@ -1969,7 +1985,7 @@
 
     <!-- Title -->
     <div style="margin-bottom:1.5rem">
-      <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">Risk Management</div>
+      <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">🛡️ Risk Tools</div>
       <div style="font-size:13px;color:var(--muted)">คำนวณ Risk ที่เหมาะสมสำหรับการเทรดกองทุน — กรอก Parameter แล้วกด Calculate</div>
     </div>
 
@@ -3371,7 +3387,11 @@ function switchPage(page) {
   if (page === 'stats') renderStats();
   if (page === 'risk') { calcRisk(); setTimeout(ddCalcRun, 50); }
   if (page === 'mc') mcUpdateDataInfo();
+  window.scrollTo({ top: 0, behavior: 'instant' });
   setTimeout(updateStickyOffsets, 50);
+  // Show FAB only on Trades page
+  const fab = document.getElementById('fabAddTrade');
+  if (fab) fab.style.display = page === 'trades' ? 'flex' : 'none';
 }
 
 function openSidebar() {
@@ -5041,6 +5061,12 @@ function runMonteCarlo() {
 
 
 </script>
+
+<!-- Floating Add Trade Button -->
+<button class="fab-add-trade" id="fabAddTrade" onclick="openAddModal()" title="เพิ่ม Trade" style="display:none">
+  <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+  <span class="fab-label">เพิ่ม Trade</span>
+</button>
 
 <!-- Script Source Manager Modal -->
 <div class="modal-overlay" id="scriptModal">
