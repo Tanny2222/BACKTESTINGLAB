@@ -3926,7 +3926,12 @@ function renderStats() {
   function distChart() {
     if (!distData.length) return '<div style="color:var(--muted);font-size:12px">ไม่มีข้อมูล RR</div>';
     const maxC = Math.max(...distData.map(d=>d.count), 1);
-    const W=420, H=160, pad={t:14,r:4,b:36,l:4};
+
+    // find mode bin (positive side only)
+    const posBins = distData.filter(d => d.min >= 0 && d.count > 0);
+    const modeBin = posBins.length ? posBins.reduce((a,b) => b.count > a.count ? b : a) : null;
+
+    const W=420, H=170, pad={t:20,r:4,b:36,l:4};
     const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
     const bw = Math.max(Math.floor(cw/distData.length)-6, 4);
     let bars = '';
@@ -3935,25 +3940,26 @@ function renderStats() {
       const x = pad.l + i*(cw/distData.length) + (cw/distData.length-bw)/2;
       const y = pad.t + ch - bh;
       const mid = (d.min + d.max) / 2;
-      const col = mid >= 0 ? 'var(--green)' : 'var(--red)';
-      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="0.8"/>`;
-      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${d.count}</text>`;
-      // short label: just the lower bound
+      const isMode = modeBin && d.min === modeBin.min;
+      const col = isMode ? 'var(--gold)' : (mid >= 0 ? 'var(--green)' : 'var(--red)');
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="${isMode?'1':'0.8'}"/>`;
+      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="${isMode?'var(--gold)':'var(--muted)'}" font-weight="${isMode?'700':'400'}">${d.count}</text>`;
       const shortLabel = (d.min >= 0 ? '+' : '') + d.min;
-      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--muted)">${shortLabel}</text>`;
+      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="${isMode?'var(--gold)':'var(--muted)'}">${shortLabel}</text>`;
+      if (isMode) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--gold)">MODE</text>`;
     });
-    // zero line
     const zeroX = distData.findIndex(d => d.min === 0);
     let zeroLine = '';
     if (zeroX >= 0) {
       const zx = pad.l + zeroX*(cw/distData.length);
       zeroLine = `<line x1="${zx.toFixed(1)}" y1="${pad.t}" x2="${zx.toFixed(1)}" y2="${(pad.t+ch).toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>`;
     }
+    const modeLabel = modeBin ? `mode +${modeBin.min}~+${modeBin.max}R (${modeBin.count} trades)` : '';
     return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg">
       <line x1="${pad.l}" y1="${pad.t+ch}" x2="${W-pad.r}" y2="${pad.t+ch}" stroke="var(--border)" stroke-width="1"/>
       ${zeroLine}
       ${bars}
-      <text x="${(W-pad.r).toFixed(1)}" y="${(pad.t+ch+28).toFixed(1)}" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--muted)" opacity="0.6">per 5R range</text>
+      <text x="${(W-pad.r).toFixed(1)}" y="${(pad.t+ch+28).toFixed(1)}" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--gold)" opacity="0.8">${modeLabel}</text>
     </svg>`;
   }
 
