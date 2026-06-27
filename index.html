@@ -1623,27 +1623,53 @@
 
   /* Account Overview */
   .stat-account-section { padding: 1rem 0 0; }
-  .acct-setting-grid { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
-  .acct-input-card {
-    display: flex; flex-direction: column; gap: 8px;
-    background: linear-gradient(135deg, var(--surface) 0%, rgba(245,158,11,0.06) 100%);
-    border: 1px solid rgba(245,158,11,0.3);
+
+  /* ── Row 1: Input grid (Balance / Risk% / Risk per Trade) ── */
+  .acct-setting-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  /* ── Row 2: Equity / PNL / Growth ── */
+  .acct-epg-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  /* Shared card base */
+  .acct-input-card,
+  .acct-result-card {
+    display: flex; flex-direction: column; gap: 6px;
     border-radius: var(--radius); padding: 16px 20px;
-    min-width: 160px; flex: 1;
     position: relative; overflow: hidden;
+  }
+
+  /* Input card: Balance */
+  .acct-input-card {
+    background: var(--surface);
+    border: 1px solid rgba(245,158,11,0.35);
+    box-shadow: 0 0 18px rgba(245,158,11,0.04);
   }
   .acct-input-card::before {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent 60%, rgba(245,158,11,0.06));
+    background: linear-gradient(135deg, transparent 55%, rgba(245,158,11,0.05));
     pointer-events: none;
   }
+
+  /* Input card: Risk% */
   .acct-input-card.acct-risk {
-    background: linear-gradient(135deg, var(--surface) 0%, rgba(231,76,60,0.06) 100%);
-    border-color: rgba(231,76,60,0.25);
+    border-color: rgba(224,90,90,0.3);
+    box-shadow: 0 0 18px rgba(224,90,90,0.04);
   }
   .acct-input-card.acct-risk::before {
-    background: linear-gradient(135deg, transparent 60%, rgba(231,76,60,0.06));
+    background: linear-gradient(135deg, transparent 55%, rgba(224,90,90,0.05));
   }
+  .acct-risk .acct-input-suffix { color: var(--red) !important; opacity: 0.7 !important; }
+
   .acct-label {
     display: flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 700; letter-spacing: .09em;
@@ -1652,38 +1678,37 @@
   .acct-label svg { width: 12px; height: 12px; stroke: #f59e0b; fill: none; stroke-width: 2; flex-shrink: 0; }
   .acct-risk .acct-label { color: var(--red); }
   .acct-risk .acct-label svg { stroke: var(--red); }
-  .acct-risk .acct-input-suffix { color: var(--red) !important; opacity: 0.7 !important; }
+
   .acct-input-underline {
-    position: relative; flex: 1; display: flex; align-items: center;
-    border-bottom: 1.5px solid rgba(245,158,11,0.45);
-    padding-bottom: 2px;
+    position: relative; display: flex; align-items: center;
+    border-bottom: 1.5px solid rgba(245,158,11,0.4);
+    padding-bottom: 2px; margin-top: 4px;
   }
-  .acct-risk .acct-input-underline { border-bottom-color: rgba(231,76,60,0.45); }
+  .acct-risk .acct-input-underline { border-bottom-color: rgba(224,90,90,0.4); }
+
   .acct-input-field {
     flex: 1; width: 100%; background: none; border: none; outline: none;
-    color: var(--text); font-size: 28px; font-family: var(--font-mono);
-    font-weight: 700; padding: 0; min-height: 34px;
+    color: var(--text); font-size: 26px; font-family: var(--font-mono);
+    font-weight: 700; padding: 0; min-height: 32px;
     -moz-appearance: textfield;
   }
   .acct-input-field::-webkit-outer-spin-button,
   .acct-input-field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .acct-input-field::placeholder { color: var(--border); font-size: 20px; font-weight: 400; }
+  .acct-input-field::placeholder { color: var(--border); font-size: 18px; font-weight: 400; }
   .acct-input-suffix {
-    font-size: 14px; font-family: var(--font-mono); font-weight: 600;
-    color: #5B8DEF; opacity: 0.6; pointer-events: none; flex-shrink: 0; margin-left: 4px;
+    font-size: 13px; font-family: var(--font-mono); font-weight: 600;
+    color: var(--muted); opacity: 0.7; pointer-events: none; flex-shrink: 0; margin-left: 4px;
   }
+
+  /* Result card: Risk per Trade */
   .acct-result-card {
-    display: flex; flex-direction: column; gap: 8px;
-    background: linear-gradient(135deg, rgba(224,90,90,0.08) 0%, rgba(224,90,90,0.03) 100%);
-    border: 1px solid rgba(224,90,90,0.35);
-    border-radius: var(--radius); padding: 16px 20px;
-    min-width: 180px; flex: 1;
-    box-shadow: 0 0 24px rgba(224,90,90,0.08);
-    position: relative; overflow: hidden;
+    background: var(--surface);
+    border: 1px solid rgba(224,90,90,0.3);
+    box-shadow: 0 0 18px rgba(224,90,90,0.06);
   }
   .acct-result-card::before {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent 50%, rgba(224,90,90,0.05));
+    background: linear-gradient(135deg, transparent 50%, rgba(224,90,90,0.04));
     pointer-events: none;
   }
   .acct-result-label {
@@ -1693,33 +1718,33 @@
   }
   .acct-result-label svg { width: 12px; height: 12px; stroke: var(--red); fill: none; stroke-width: 2; flex-shrink: 0; }
   .acct-result-val {
-    font-family: var(--font-mono); font-size: 32px; font-weight: 700;
-    color: var(--red); line-height: 1; flex: 1;
-    display: flex; align-items: center;
-    text-shadow: 0 0 20px rgba(224,90,90,0.3);
+    font-family: var(--font-mono); font-size: 26px; font-weight: 700;
+    color: var(--red); line-height: 1; margin-top: 4px;
   }
   .acct-result-sub { font-size: 11px; color: var(--muted); }
+
+  /* Equity / PNL / Growth cards */
   .acct-stat-card {
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 6px;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 16px 20px;
-    min-width: 130px; flex: 1; position: relative; overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .acct-stat-card::before {
     content: ''; position: absolute; inset: 0;
     pointer-events: none;
   }
-  .acct-stat-card.equity { border-color: rgba(91,141,239,0.3); background: linear-gradient(135deg, var(--surface), rgba(91,141,239,0.06)); }
-  .acct-stat-card.equity::before { background: linear-gradient(135deg, transparent 60%, rgba(91,141,239,0.06)); }
-  .acct-stat-card.pnl-pos { border-color: rgba(59,191,126,0.3); background: linear-gradient(135deg, var(--surface), rgba(59,191,126,0.06)); }
-  .acct-stat-card.pnl-pos::before { background: linear-gradient(135deg, transparent 60%, rgba(59,191,126,0.06)); }
-  .acct-stat-card.pnl-neg { border-color: rgba(231,76,60,0.3); background: linear-gradient(135deg, var(--surface), rgba(231,76,60,0.06)); }
-  .acct-stat-card.pnl-neg::before { background: linear-gradient(135deg, transparent 60%, rgba(231,76,60,0.06)); }
-  .acct-stat-card.growth { border-color: rgba(245,158,11,0.3); background: linear-gradient(135deg, var(--surface), rgba(245,158,11,0.06)); }
-  .acct-stat-card.growth::before { background: linear-gradient(135deg, transparent 60%, rgba(245,158,11,0.06)); }
+  .acct-stat-card.equity { border-color: rgba(91,141,239,0.3); }
+  .acct-stat-card.equity::before { background: linear-gradient(135deg, transparent 55%, rgba(91,141,239,0.05)); }
+  .acct-stat-card.pnl-pos { border-color: rgba(59,191,126,0.3); }
+  .acct-stat-card.pnl-pos::before { background: linear-gradient(135deg, transparent 55%, rgba(59,191,126,0.05)); }
+  .acct-stat-card.pnl-neg { border-color: rgba(224,90,90,0.3); }
+  .acct-stat-card.pnl-neg::before { background: linear-gradient(135deg, transparent 55%, rgba(224,90,90,0.05)); }
+  .acct-stat-card.growth { border-color: rgba(245,158,11,0.3); }
+  .acct-stat-card.growth::before { background: linear-gradient(135deg, transparent 55%, rgba(245,158,11,0.05)); }
   .acct-stat-label { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
   .acct-stat-label svg { width: 12px; height: 12px; fill: none; stroke-width: 2; flex-shrink: 0; }
-  .acct-stat-val { font-family: var(--font-mono); font-size: 26px; font-weight: 700; line-height: 1; }
+  .acct-stat-val { font-family: var(--font-mono); font-size: 26px; font-weight: 700; line-height: 1; margin-top: 4px; }
   .acct-stat-sub { font-size: 11px; color: var(--muted); }
   .charts-row { display: grid; gap: 12px; }
   .charts-row.col2 { grid-template-columns: 1fr 1fr; }
@@ -1767,6 +1792,8 @@
     .charts-row.col3 { grid-template-columns: 1fr 1fr; }
     .charts-row.col-3-2 { grid-template-columns: 1fr; }
     .session-grid { grid-template-columns: repeat(2, 1fr); }
+    .acct-setting-grid { grid-template-columns: repeat(3, 1fr); }
+    .acct-epg-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   @media (max-width: 768px) {
@@ -1789,6 +1816,8 @@
     .tag-stat-table th, .tag-stat-table td { padding: 8px 8px; }
     .rr-bar-track { width: 50px; }
     .session-card-wr { font-size: 26px; }
+    .acct-setting-grid { grid-template-columns: 1fr 1fr; }
+    .acct-epg-grid { grid-template-columns: 1fr 1fr 1fr; }
   }
 
   @media (max-width: 480px) {
@@ -1811,6 +1840,10 @@
     .tag-stat-table th, .tag-stat-table td { padding: 6px 6px; }
     .rr-bar-track { width: 36px; }
     .rr-bar-wrap { gap: 4px; }
+    .acct-setting-grid { grid-template-columns: 1fr; }
+    .acct-epg-grid { grid-template-columns: 1fr; }
+    .acct-input-field { font-size: 22px; }
+    .acct-stat-val, .acct-result-val { font-size: 22px; }
   }
 
   @media (max-width: 380px) {
@@ -3697,8 +3730,10 @@ function populateEntryTimeOptions() {
 // ── Statistics Page ──
 // ══════════════════════════════════════════════
 // ── Account Setting ──
-let acctBalance = parseFloat(localStorage.getItem('btj_acct_balance')) || 0;
-let acctRiskPct = parseFloat(localStorage.getItem('btj_acct_risk_pct')) || 0;
+let acctBalance = parseFloat(localStorage.getItem('btj_acct_balance') ?? 'NaN');
+if (isNaN(acctBalance)) acctBalance = 5000;
+let acctRiskPct = parseFloat(localStorage.getItem('btj_acct_risk_pct') ?? 'NaN');
+if (isNaN(acctRiskPct)) acctRiskPct = 1;
 
 function saveAcctSetting() {
   const bal = parseFloat(document.getElementById('acctBalance')?.value) || 0;
@@ -3722,7 +3757,6 @@ function saveAcctSetting() {
   const totalRR = t.reduce((s, x) => {
     const r = parseFloat(x.rr); return s + (isNaN(r) ? 0 : r);
   }, 0);
-  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(2) + 'R';
 
   if (!bal || !rp) {
     epgRow.innerHTML = `
@@ -3758,6 +3792,74 @@ function saveAcctSetting() {
       <div class="acct-stat-val" style="color:#f59e0b">${growthSign}${growth.toFixed(1)}%</div>
       <div class="acct-stat-sub">PNL ÷ Balance</div>
     </div>`;
+
+  // Update Cumulative PNL chart live
+  updatePNLChart(rd);
+}
+
+function updatePNLChart(riskDollar) {
+  const chartEl = document.getElementById('pnlChartArea');
+  const badgeEl = document.getElementById('pnlChartBadge');
+  if (!chartEl) return;
+
+  const sorted = trades.slice().sort((a,b) => {
+    const da = a.tradeDate||'', db = b.tradeDate||'';
+    if (da !== db) return da < db ? -1 : 1;
+    return (parseInt(a.tradeNo,10)||0) - (parseInt(b.tradeNo,10)||0);
+  });
+
+  let cum = 0;
+  const pts = [{n:0, v:0}];
+  sorted.forEach((x,i) => {
+    const r = parseFloat(x.rr);
+    if (!isNaN(r)) cum += r * riskDollar;
+    pts.push({ n: i+1, v: cum });
+  });
+
+  const fmtBadge = v => {
+    const sign = v >= 0 ? '+' : '';
+    return sign + '$' + v.toFixed(2);
+  };
+  if (badgeEl) {
+    badgeEl.textContent = fmtBadge(cum);
+    badgeEl.style.color = cum >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+
+  // Build inline SVG (reuse same logic)
+  const W = 580, H = 120;
+  const pad = {t:10,r:10,b:20,l:52};
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+  const maxV = Math.max(...pts.map(p=>p.v), 0.01);
+  const minV = Math.min(...pts.map(p=>p.v), -0.01);
+  const range = maxV - minV || 1;
+  const xs = i => pad.l + i/(pts.length-1) * cw;
+  const ys = v => pad.t + ch - (v - minV)/range * ch;
+  const zeroY = ys(0);
+  const lastPt = pts[pts.length-1];
+  const lineColor = lastPt.v >= 0 ? 'var(--green)' : 'var(--red)';
+  const gradColor = lineColor;
+  const polyline = pts.map((p,i)=>`${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ');
+  const areaPath = `M${xs(0).toFixed(1)},${zeroY.toFixed(1)} ` +
+    pts.map((p,i)=>`L${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ') +
+    ` L${xs(pts.length-1).toFixed(1)},${zeroY.toFixed(1)} Z`;
+  const fmtDollar = v => {
+    const abs = Math.abs(v), sign = v >= 0 ? '+' : '-';
+    return abs >= 1000 ? sign+'$'+(abs/1000).toFixed(1)+'k' : sign+'$'+abs.toFixed(0);
+  };
+  const yTicks = [minV, 0, maxV].map(v => ({ v, y: ys(v), label: fmtDollar(v) }));
+  chartEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="pnlGlive" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${gradColor}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${gradColor}" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <line x1="${pad.l}" y1="${zeroY.toFixed(1)}" x2="${W-pad.r}" y2="${zeroY.toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+    ${yTicks.map(tick=>`<text x="${(pad.l-4).toFixed(1)}" y="${tick.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${tick.label}</text>`).join('')}
+    <path d="${areaPath}" fill="url(#pnlGlive)"/>
+    <polyline points="${polyline}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${xs(pts.length-1).toFixed(1)}" cy="${ys(lastPt.v).toFixed(1)}" r="3" fill="${lineColor}"/>
+  </svg>`;
 }
 
 function renderStats() {
@@ -3813,13 +3915,23 @@ function renderStats() {
   const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(2);
   const pct = v => v.toFixed(1) + '%';
 
-  // ── Equity curve data ──
+  // ── Equity curve data (Cumulative RR) ──
   let equity = 0;
   const eqPoints = [{n:0, v:0}];
   sorted.forEach((x,i) => {
     const r = parseFloat(x.rr);
     if (!isNaN(r)) equity += r;
     eqPoints.push({ n: i+1, v: equity });
+  });
+
+  // ── Cumulative PNL data ($) ──
+  const riskDollarForChart = (acctBalance && acctRiskPct) ? acctBalance * acctRiskPct / 100 : null;
+  let pnlCum = 0;
+  const pnlPoints = [{n:0, v:0}];
+  sorted.forEach((x,i) => {
+    const r = parseFloat(x.rr);
+    if (!isNaN(r) && riskDollarForChart) pnlCum += r * riskDollarForChart;
+    pnlPoints.push({ n: i+1, v: pnlCum });
   });
 
   // ── By session ──
@@ -4042,6 +4154,48 @@ function renderStats() {
     </svg>`;
   }
 
+  // Helper: Cumulative PNL Curve SVG (y-axis in $)
+  function pnlSVG(pts, W=600, H=120) {
+    if (pts.length < 2) return '';
+    const pad = {t:10,r:10,b:20,l:52};
+    const cw = W - pad.l - pad.r;
+    const ch = H - pad.t - pad.b;
+    const maxV = Math.max(...pts.map(p=>p.v), 0.01);
+    const minV = Math.min(...pts.map(p=>p.v), -0.01);
+    const range = maxV - minV || 1;
+    const xs = i => pad.l + i/(pts.length-1) * cw;
+    const ys = v => pad.t + ch - (v - minV)/range * ch;
+    const zeroY = ys(0);
+    const lastPt = pts[pts.length-1];
+    const lineColor = lastPt.v >= 0 ? 'var(--green)' : 'var(--red)';
+    const gradId = lastPt.v >= 0 ? 'pnlGpos' : 'pnlGneg';
+    const gradColor = lastPt.v >= 0 ? 'var(--green)' : 'var(--red)';
+    const polyline = pts.map((p,i)=>`${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ');
+    const areaPath = `M${xs(0).toFixed(1)},${zeroY.toFixed(1)} ` +
+      pts.map((p,i)=>`L${xs(i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(' ') +
+      ` L${xs(pts.length-1).toFixed(1)},${zeroY.toFixed(1)} Z`;
+    const fmtDollar = v => {
+      const abs = Math.abs(v);
+      const sign = v >= 0 ? '+' : '-';
+      if (abs >= 1000) return sign + '$' + (abs/1000).toFixed(1) + 'k';
+      return sign + '$' + abs.toFixed(0);
+    };
+    const yTicks = [minV, 0, maxV].map(v => ({ v, y: ys(v), label: fmtDollar(v) }));
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${gradColor}" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="${gradColor}" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <line x1="${pad.l}" y1="${zeroY.toFixed(1)}" x2="${W-pad.r}" y2="${zeroY.toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+      ${yTicks.map(tick=>`<text x="${(pad.l-4).toFixed(1)}" y="${tick.y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--muted)">${tick.label}</text>`).join('')}
+      <path d="${areaPath}" fill="url(#${gradId})"/>
+      <polyline points="${polyline}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${xs(pts.length-1).toFixed(1)}" cy="${ys(lastPt.v).toFixed(1)}" r="3" fill="${lineColor}"/>
+    </svg>`;
+  }
+
   // ── Day of Week bar chart ──
   function dowChart() {
     const active = dayData.filter(d=>d.n>0);
@@ -4225,7 +4379,7 @@ function renderStats() {
     </div>
 
     <!-- Equity / PNL / Growth row -->
-    <div class="acct-setting-grid" id="acctEPGRow" style="margin-top:10px">
+    <div class="acct-epg-grid" id="acctEPGRow">
       ${(() => {
         if (!acctBalance || !acctRiskPct) return `
           <div class="acct-stat-card equity"><div class="acct-stat-label" style="color:#5B8DEF"><svg viewBox="0 0 16 16" stroke="#5B8DEF"><polyline points="2,12 6,7 9,10 14,4"/></svg>Equity</div><div class="acct-stat-val" style="color:var(--muted)">—</div><div class="acct-stat-sub">ต้องการ Balance + Risk%</div></div>
@@ -4327,11 +4481,25 @@ function renderStats() {
   <div>
     <div class="stat-section-title">Equity Curve & Win/Loss Split</div>
     <div class="charts-row col-3-2">
-      <div class="chart-card">
-        <div class="chart-card-title">Cumulative RR
-          <span class="badge" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)} R</span>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="chart-card">
+          <div class="chart-card-title">Cumulative RR
+            <span class="badge" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)} R</span>
+          </div>
+          ${equitySVG(eqPoints, 580, 120)}
         </div>
-        ${equitySVG(eqPoints, 580, 130)}
+        <div class="chart-card">
+          <div class="chart-card-title">Cumulative PNL ($)
+            ${riskDollarForChart
+              ? `<span class="badge" id="pnlChartBadge" style="color:${pnlCum>=0?'var(--green)':'var(--red)'}">${pnlCum>=0?'+':''}$${Math.abs(pnlCum)<1000?pnlCum.toFixed(2):(pnlCum/1000).toFixed(2)+'k'}</span>`
+              : `<span class="badge" id="pnlChartBadge" style="color:var(--muted)">ต้องการ Balance + Risk%</span>`}
+          </div>
+          <div id="pnlChartArea">
+          ${riskDollarForChart
+            ? pnlSVG(pnlPoints, 580, 120)
+            : `<div style="color:var(--muted);font-size:12px;padding:1.5rem 0;text-align:center">กรอก Balance และ Risk% ใน Account Overview เพื่อดูกราฟ PNL ($)</div>`}
+          </div>
+        </div>
       </div>
       <div class="chart-card">
         <div class="chart-card-title">Result Split</div>
