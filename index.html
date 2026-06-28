@@ -1798,7 +1798,21 @@
     .acct-epg-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
-  @media (max-width: 768px) {
+  /* ── Tab label hide at medium width ── */
+  @media (max-width: 960px) {
+    .page-tab-label { display: none; }
+    .page-tab { padding: 7px 10px; gap: 0; }
+    .page-tabs { gap: 2px; }
+  }
+
+  /* ── Tab emoji shrink further ── */
+  @media (max-width: 720px) {
+    .page-tab { padding: 6px 8px; font-size: 15px; }
+    .pill-icon-btn { padding: 6px 8px; }
+    .source-icon-label { display: none; }
+  }
+
+  @media (max-width: 600px) {
     header { padding: 0.7rem 1rem; gap: 0.75rem; flex-wrap: wrap; }
     .stats-bar { display: none; }
     .page-tabs { display: none; }
@@ -2014,11 +2028,11 @@
 
   <!-- ── Tab menu floating pill bar ── -->
   <div class="page-tabs">
-    <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">📊 Statistics</button>
-    <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">📋 Trades</button>
-    <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">🖼️ Gallery</button>
-    <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">🛡️ Risk Analysis</button>
-    <button class="page-tab" id="tabMC" onclick="switchPage('mc')">🎲 Monte Carlo</button>
+    <button class="page-tab active" id="tabStats" onclick="switchPage('stats')">📊 <span class="page-tab-label">Statistics</span></button>
+    <button class="page-tab" id="tabTrades" onclick="switchPage('trades')">📋 <span class="page-tab-label">Trades</span></button>
+    <button class="page-tab" id="tabGallery" onclick="switchPage('gallery')">🖼️ <span class="page-tab-label">Gallery</span></button>
+    <button class="page-tab" id="tabRisk" onclick="switchPage('risk')">🛡️ <span class="page-tab-label">Risk Analysis</span></button>
+    <button class="page-tab" id="tabMC" onclick="switchPage('mc')">🎲 <span class="page-tab-label">Monte Carlo</span></button>
     <div class="pill-divider"></div>
     <button class="pill-icon-btn" onclick="openScriptModal()" title="จัดการ Script Source" id="sourceChip">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px">
@@ -4273,7 +4287,9 @@ function renderStats() {
     const maxC = Math.max(...distData.map(d=>d.count), 1);
 
     const posBins = distData.filter(d => d.min >= 0 && d.count > 0);
-    const modeBin = posBins.length ? posBins.reduce((a,b) => b.count > a.count ? b : a) : null;
+    const modeCount = posBins.length ? Math.max(...posBins.map(d => d.count)) : 0;
+    const modeBins = posBins.filter(d => d.count === modeCount);
+    const modeMinSet = new Set(modeBins.map(d => d.min));
 
     const W=420, H=170, pad={t:22,r:4,b:36,l:4};
     const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
@@ -4284,13 +4300,13 @@ function renderStats() {
       const x = pad.l + i*(cw/distData.length) + (cw/distData.length-bw)/2;
       const y = pad.t + ch - bh;
       const mid = (d.min + d.max) / 2;
-      const isMode = modeBin && d.min === modeBin.min;
-      const col = isMode ? 'var(--gold)' : (mid >= 0 ? 'var(--green)' : 'var(--red)');
+      const isMode = modeMinSet.has(d.min);
+      const col = isMode ? '#F5D04A' : (mid >= 0 ? 'var(--green)' : 'var(--red)');
       bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="${isMode?'1':'0.8'}"/>`;
-      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="${isMode?'var(--gold)':'var(--muted)'}" font-weight="${isMode?'700':'400'}">${d.count}</text>`;
-      if (isMode) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="var(--gold)">MODE</text>`;
+      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="${isMode?'#F5D04A':'var(--muted)'}" font-weight="${isMode?'700':'400'}">${d.count}</text>`;
+      if (isMode) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#F5D04A">MODE</text>`;
       const shortLabel = (d.min >= 0 ? '+' : '') + d.min;
-      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="${isMode?'var(--gold)':'var(--muted)'}">${shortLabel}</text>`;
+      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="${isMode?'#F5D04A':'var(--muted)'}">${shortLabel}</text>`;
     });
     const zeroIdx = distData.findIndex(d => d.min === 0);
     let zeroLine = '';
@@ -4298,7 +4314,11 @@ function renderStats() {
       const zx = pad.l + zeroIdx*(cw/distData.length);
       zeroLine = `<line x1="${zx.toFixed(1)}" y1="${pad.t}" x2="${zx.toFixed(1)}" y2="${(pad.t+ch).toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>`;
     }
-    const modeLabel = modeBin ? `mode +${modeBin.min}~+${modeBin.max}R (${modeBin.count} trades)` : '';
+    const modeLabel = modeBins.length
+      ? (modeBins.length === 1
+          ? `mode +${modeBins[0].min}~+${modeBins[0].max}R (${modeCount} trades)`
+          : `mode ×${modeBins.length} bins (${modeCount} trades each)`)
+      : '';
     return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg">
       <line x1="${pad.l}" y1="${pad.t+ch}" x2="${W-pad.r}" y2="${pad.t+ch}" stroke="var(--border)" stroke-width="1"/>
       ${zeroLine}${bars}
