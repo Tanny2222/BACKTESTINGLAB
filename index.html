@@ -129,7 +129,7 @@
   /* ─── Header ─── */
   header {
     border-bottom: 1px solid var(--border);
-    padding: 0.9rem 2rem;
+    padding: 1.25rem 2rem;
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -348,34 +348,36 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border: 1.5px solid var(--gold);
-    border-radius: 6px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: rgba(245,158,11,0.06);
+    box-shadow: 0 0 12px rgba(245,158,11,0.15);
   }
 
-  .logo-icon svg { width: 16px; height: 16px; stroke: var(--gold); fill: none; stroke-width: 2; }
+  .logo-icon svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 2; }
 
   .logo-text {
     font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: var(--gold);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
 
   .logo-sub {
     font-size: 11px;
     color: var(--muted);
     letter-spacing: 0.05em;
-    margin-top: 1px;
+    margin-top: 2px;
   }
 
   .header-actions { display: flex; gap: 10px; align-items: center; }
@@ -2031,6 +2033,12 @@
     </button>
   </div>
 
+  <div style="margin-left:auto;display:flex;align-items:center">
+    <div style="text-align:right">
+      <div style="font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);opacity:0.6">© Veerayas</div>
+    </div>
+  </div>
+
 </header>
 
 <!-- hidden stat elements for JS compatibility -->
@@ -2173,11 +2181,6 @@
 
 <!-- ═══ Statistics Page ═══ -->
 <div id="pageStats" class="page-view active">
-  <!-- Page Title (static, same style as other pages) -->
-  <div style="padding:1.5rem 2rem 0">
-    <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">📊 Statistics</div>
-    <div style="font-size:13px;color:var(--muted)">สรุปผลการเทรดและวิเคราะห์ประสิทธิภาพของระบบ</div>
-  </div>
   <div class="stats-page" id="statsPageContent">
     <!-- filled by renderStats() -->
   </div>
@@ -4336,83 +4339,6 @@ function renderStats() {
   // ── Render all ──
   el.innerHTML = `
 
-  <!-- Account Overview -->
-  <div class="stat-section stat-account-section">
-    <div class="stat-section-title">Account Overview</div>
-    <div class="acct-setting-grid">
-      <div class="acct-input-card">
-        <div class="acct-label">
-          <svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/><path d="M2 8h12"/></svg>
-          Balance ($)
-        </div>
-        <div class="acct-input-underline">
-          <input type="number" id="acctBalance" class="acct-input-field" placeholder="10,000"
-            value="${acctBalance||''}" oninput="saveAcctSetting()" />
-        </div>
-      </div>
-      <div class="acct-input-card acct-risk">
-        <div class="acct-label">
-          <svg viewBox="0 0 16 16"><circle cx="5" cy="11" r="1.5"/><circle cx="11" cy="5" r="1.5"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
-          Risk %
-        </div>
-        <div class="acct-input-underline">
-          <input type="number" id="acctRiskPct" class="acct-input-field" placeholder="1.0" step="0.1" min="0" max="100"
-            value="${acctRiskPct||''}" oninput="saveAcctSetting()" />
-          <span class="acct-input-suffix">%</span>
-        </div>
-      </div>
-      ${(() => {
-        const riskDollar = acctBalance && acctRiskPct ? (acctBalance * acctRiskPct / 100) : null;
-        return `<div class="acct-result-card">
-          <div class="acct-result-label">
-            <svg viewBox="0 0 16 16"><circle cx="5" cy="11" r="1.5"/><circle cx="11" cy="5" r="1.5"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
-            Risk per Trade ($)
-          </div>
-          <div class="acct-result-val" id="acctRiskDollar">
-            ${riskDollar !== null ? '$' + riskDollar.toFixed(2) : '—'}
-          </div>
-          <div class="acct-result-sub" id="acctRiskSub">
-            ${riskDollar !== null ? acctRiskPct + '% of $' + Number(acctBalance).toLocaleString() : 'กรอก Balance และ Risk% เพื่อคำนวณ'}
-          </div>
-        </div>`;
-      })()}
-    </div>
-
-    <!-- Equity / PNL / Growth row -->
-    <div class="acct-epg-grid" id="acctEPGRow">
-      ${(() => {
-        if (!acctBalance || !acctRiskPct) return `
-          <div class="acct-stat-card equity"><div class="acct-stat-label" style="color:#5B8DEF"><svg viewBox="0 0 16 16" stroke="#5B8DEF"><polyline points="2,12 6,7 9,10 14,4"/></svg>Equity</div><div class="acct-stat-val" style="color:var(--muted)">—</div><div class="acct-stat-sub">ต้องการ Balance + Risk%</div></div>
-          <div class="acct-stat-card"><div class="acct-stat-label" style="color:var(--muted)"><svg viewBox="0 0 16 16" stroke="currentColor"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>PNL ($)</div><div class="acct-stat-val" style="color:var(--muted)">—</div><div class="acct-stat-sub">ต้องการ Balance + Risk%</div></div>
-          <div class="acct-stat-card growth"><div class="acct-stat-label" style="color:#f59e0b"><svg viewBox="0 0 16 16" stroke="#f59e0b"><polyline points="2,13 7,7 10,10 14,5"/><polyline points="11,5 14,5 14,8"/></svg>Growth</div><div class="acct-stat-val" style="color:var(--muted)">—</div><div class="acct-stat-sub">ต้องการ Balance + Risk%</div></div>`;
-        const riskDollar = acctBalance * acctRiskPct / 100;
-        const pnl = riskDollar * totalRR;
-        const equity = acctBalance + pnl;
-        const growth = (pnl / acctBalance) * 100;
-        const pnlPos = pnl >= 0;
-        const pnlClass = pnlPos ? 'pnl-pos' : 'pnl-neg';
-        const pnlCol = pnlPos ? 'var(--green)' : 'var(--red)';
-        const growthSign = growth >= 0 ? '+' : '';
-        return `
-          <div class="acct-stat-card equity">
-            <div class="acct-stat-label" style="color:#5B8DEF"><svg viewBox="0 0 16 16" stroke="#5B8DEF"><polyline points="2,12 6,7 9,10 14,4"/></svg>Equity</div>
-            <div class="acct-stat-val" style="color:#5B8DEF">$${equity.toFixed(1)}</div>
-            <div class="acct-stat-sub">Balance + PNL</div>
-          </div>
-          <div class="acct-stat-card ${pnlClass}">
-            <div class="acct-stat-label" style="color:${pnlCol}"><svg viewBox="0 0 16 16" stroke="${pnlCol}">${pnlPos ? '<polyline points="8,12 8,4"/><polyline points="4,8 8,4 12,8"/>' : '<polyline points="8,4 8,12"/><polyline points="4,8 8,12 12,8"/>'}</svg>PNL ($)</div>
-            <div class="acct-stat-val" style="color:${pnlCol}">${pnlPos?'+':''}$${pnl.toFixed(1)}</div>
-            <div class="acct-stat-sub">${fmt(totalRR)}R × $${riskDollar.toFixed(2)}</div>
-          </div>
-          <div class="acct-stat-card growth">
-            <div class="acct-stat-label" style="color:#f59e0b"><svg viewBox="0 0 16 16" stroke="#f59e0b"><polyline points="2,13 7,7 10,10 14,5"/><polyline points="11,5 14,5 14,8"/></svg>Growth</div>
-            <div class="acct-stat-val" style="color:#f59e0b">${growthSign}${growth.toFixed(1)}%</div>
-            <div class="acct-stat-sub">PNL ÷ Balance</div>
-          </div>`;
-      })()}
-    </div>
-  </div>
-
   <!-- KPI Row -->
   <div>
     <div class="stat-section-title">Overview</div>
@@ -4481,25 +4407,11 @@ function renderStats() {
   <div>
     <div class="stat-section-title">Equity Curve & Win/Loss Split</div>
     <div class="charts-row col-3-2">
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="chart-card">
-          <div class="chart-card-title">Cumulative RR
-            <span class="badge" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)} R</span>
-          </div>
-          ${equitySVG(eqPoints, 580, 120)}
+      <div class="chart-card">
+        <div class="chart-card-title">Cumulative RR
+          <span class="badge" style="color:${totalRR>=0?'var(--green)':'var(--red)'}">${fmt(totalRR)} R</span>
         </div>
-        <div class="chart-card">
-          <div class="chart-card-title">Cumulative PNL ($)
-            ${riskDollarForChart
-              ? `<span class="badge" id="pnlChartBadge" style="color:${pnlCum>=0?'var(--green)':'var(--red)'}">${pnlCum>=0?'+':''}$${Math.abs(pnlCum)<1000?pnlCum.toFixed(2):(pnlCum/1000).toFixed(2)+'k'}</span>`
-              : `<span class="badge" id="pnlChartBadge" style="color:var(--muted)">ต้องการ Balance + Risk%</span>`}
-          </div>
-          <div id="pnlChartArea">
-          ${riskDollarForChart
-            ? pnlSVG(pnlPoints, 580, 120)
-            : `<div style="color:var(--muted);font-size:12px;padding:1.5rem 0;text-align:center">กรอก Balance และ Risk% ใน Account Overview เพื่อดูกราฟ PNL ($)</div>`}
-          </div>
-        </div>
+        ${equitySVG(eqPoints, 580, 120)}
       </div>
       <div class="chart-card">
         <div class="chart-card-title">Result Split</div>
