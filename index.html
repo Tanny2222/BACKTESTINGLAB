@@ -53,6 +53,38 @@
     --red: #C96060;
   }
 
+  /* ── Compote theme (mauve · slate-blue · lavender · ash) ── */
+  html[data-theme="compote"] {
+    --bg: #EDEAF0;
+    --surface: #F5F3F8;
+    --surface2: #E2DEE9;
+    --border: #C9C4D4;
+    --text: #2B2535;
+    --muted: #7A7490;
+    --gold: #A4506A;
+    --gold-dim: #C9809A;
+    --green: #4D7A8A;
+    --red: #A0405A;
+    --accent1: #A03050; /* rose-mauve */
+    --accent2: #4A5E80; /* slate-blue */
+    --accent3: #9080B0; /* lavender */
+    --accent4: #C8C4D0; /* ash-gray */
+  }
+
+  /* ── Retro theme (phosphor amber · smoke · aged CRT) ── */
+  html[data-theme="retro"] {
+    --bg: #1C1A17;
+    --surface: #252219;
+    --surface2: #2E2A22;
+    --border: #3D3830;
+    --text: #D4C9A8;
+    --muted: #7A7060;
+    --gold: #B8873A;
+    --gold-dim: #6B4E20;
+    --green: #8FA870;
+    --red: #A85848;
+  }
+
   html, body {
     overflow-x: clip;
     width: 100%;
@@ -488,6 +520,17 @@
   html[data-theme="pastel"] .pill-icon-btn .icon-moon { display: none !important; }
   html[data-theme="pastel"] .pill-icon-btn .icon-palette { display: block !important; }
   .pill-icon-btn .icon-palette { display: none; }
+  html[data-theme="compote"] .pill-icon-btn .icon-sun { display: none !important; }
+  html[data-theme="compote"] .pill-icon-btn .icon-moon { display: none !important; }
+  html[data-theme="compote"] .pill-icon-btn .icon-palette { display: none !important; }
+  html[data-theme="compote"] .pill-icon-btn .icon-compote { display: block !important; }
+  .pill-icon-btn .icon-compote { display: none; }
+  html[data-theme="retro"] .pill-icon-btn .icon-sun { display: none !important; }
+  html[data-theme="retro"] .pill-icon-btn .icon-moon { display: none !important; }
+  html[data-theme="retro"] .pill-icon-btn .icon-palette { display: none !important; }
+  html[data-theme="retro"] .pill-icon-btn .icon-compote { display: none !important; }
+  html[data-theme="retro"] .pill-icon-btn .icon-retro { display: block !important; }
+  .pill-icon-btn .icon-retro { display: none; }
 
   .page-view { display: none; }
   .page-view.active { display: block; }
@@ -2121,6 +2164,8 @@
       <svg class="icon-moon" viewBox="0 0 16 16" style="width:15px;height:15px"><path d="M14 8.5A6 6 0 116.5 2 5 5 0 0014 8.5z"/></svg>
       <svg class="icon-sun" viewBox="0 0 16 16" style="width:15px;height:15px;display:none"><circle cx="8" cy="8" r="3.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13"/></svg>
       <svg class="icon-palette" viewBox="0 0 16 16" style="width:15px;height:15px;display:none"><circle cx="8" cy="8" r="6.5" fill="none"/><circle cx="5.5" cy="5.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="5.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="9.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="9.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <svg class="icon-compote" viewBox="0 0 16 16" style="width:15px;height:15px;display:none"><circle cx="2.5" cy="8" r="2.2" fill="#A03050"/><circle cx="6.5" cy="8" r="2.2" fill="#4A5E80"/><circle cx="10.5" cy="8" r="2.2" fill="#9080B0"/><circle cx="14.5" cy="8" r="2.2" fill="#C8C4D0"/></svg>
+      <svg class="icon-retro" viewBox="0 0 16 16" style="width:15px;height:15px;display:none"><rect x="2" y="3" width="12" height="8" rx="1.5" fill="none" stroke-width="1.6"/><rect x="5.5" y="11" width="5" height="1.5" fill="currentColor" stroke="none"/><rect x="3.5" y="12.5" width="9" height="1" fill="currentColor" stroke="none"/><circle cx="8" cy="7" r="2" fill="none" stroke-width="1.4"/></svg>
     </button>
   </div>
 
@@ -3720,7 +3765,9 @@ function saveBanner() {
 function toggleTheme() {
   const html = document.documentElement;
   const current = html.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : current === 'light' ? 'pastel' : 'dark';
+  const order = ['dark', 'light', 'pastel', 'compote', 'retro'];
+  const idx = order.indexOf(current);
+  const next = order[(idx + 1) % order.length];
   if (next === 'dark') {
     html.removeAttribute('data-theme');
   } else {
@@ -3728,13 +3775,24 @@ function toggleTheme() {
   }
   localStorage.setItem('btj_theme', next);
   const sidebarIcon = document.querySelector('.theme-toggle-icon');
-  if (sidebarIcon) sidebarIcon.textContent = next === 'light' ? '☀️' : next === 'pastel' ? '🎨' : '🌙';
+  if (sidebarIcon) sidebarIcon.textContent = next === 'light' ? '☀️' : next === 'pastel' ? '🎨' : next === 'compote' ? '🫐' : next === 'retro' ? '📺' : '🌙';
 }
 
 (function applyTheme() {
   const saved = localStorage.getItem('btj_theme');
   if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
   else if (saved === 'pastel') document.documentElement.setAttribute('data-theme', 'pastel');
+  else if (saved === 'compote') document.documentElement.setAttribute('data-theme', 'compote');
+  else if (saved === 'retro') document.documentElement.setAttribute('data-theme', 'retro');
+  // Sync sidebar emoji
+  const sidebarIcon = document.querySelector('.theme-toggle-icon');
+  if (sidebarIcon) {
+    if (saved === 'light') sidebarIcon.textContent = '☀️';
+    else if (saved === 'pastel') sidebarIcon.textContent = '🎨';
+    else if (saved === 'compote') sidebarIcon.textContent = '🫐';
+    else if (saved === 'retro') sidebarIcon.textContent = '📺';
+    else sidebarIcon.textContent = '🌙';
+  }
 })();
 
 (function applyRiskSettings() {
