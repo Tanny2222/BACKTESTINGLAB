@@ -5115,6 +5115,13 @@ function calcRisk() {
   const el = document.getElementById('riskResults');
   if (!el) return;
 
+  // Preserve the user's currently selected DD-probability tier (and custom value)
+  // so it doesn't reset to "Moderate" every time the inputs above trigger a rebuild.
+  const prevTierSel = document.getElementById('ddCalcTier');
+  const prevTierValue = prevTierSel ? prevTierSel.value : null;
+  const prevCustomInp = document.getElementById('ddCalcCustomRisk');
+  const prevCustomValue = prevCustomInp ? prevCustomInp.value : null;
+
   // ── Pull stats from current trades ──
   const t = trades;
   const wins   = t.filter(x => x.status === 'WIN');
@@ -5383,6 +5390,30 @@ function calcRisk() {
   </div>
 
   `;
+
+  // Restore previously selected DD-probability tier / custom value (if it existed)
+  if (prevTierValue !== null) {
+    const newSel = document.getElementById('ddCalcTier');
+    if (newSel) {
+      const isCustom = prevTierValue === 'custom';
+      // 'custom' option always exists; numeric tier values are regenerated each rebuild,
+      // so only restore numeric selection if an option with that exact value still exists.
+      const optionExists = Array.from(newSel.options).some(o => o.value === prevTierValue);
+      if (isCustom || optionExists) {
+        newSel.value = prevTierValue;
+      }
+      if (isCustom) {
+        const wrap = document.getElementById('ddCalcCustomWrap');
+        if (wrap) wrap.style.display = 'flex';
+        const newCustomInp = document.getElementById('ddCalcCustomRisk');
+        if (newCustomInp && prevCustomValue !== null) newCustomInp.value = prevCustomValue;
+      }
+    }
+  }
+
+  // Re-run DD probability calculation every time calcRisk() rebuilds the DOM,
+  // so it always reflects the latest Balance / Daily DD / Max DD / Trades-per-day values.
+  ddCalcRun();
 }
 
 // ── DD Probability Calculator helpers (called from risk page) ──
