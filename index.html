@@ -1419,10 +1419,22 @@
     font-family: var(--font-mono);
     transition: background 0.1s, color 0.1s;
     white-space: nowrap;
+    user-select: none;
   }
   .tag-filter-opt:hover { background: var(--surface2); color: var(--text); }
-  .tag-filter-opt.active { color: var(--gold); }
-  .tag-filter-opt .check { width: 12px; color: var(--gold); font-size: 11px; }
+  .tag-filter-opt.active { color: var(--text); }
+  .tag-filter-opt .check {
+    width: 14px; height: 14px; min-width: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: transparent;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .tag-filter-opt.active .check {
+    background: var(--gold); border-color: var(--gold); color: #0D0F14;
+  }
 
   /* Toolbar tag-suggestions */
   .tag-suggestions {
@@ -2313,45 +2325,76 @@
 <div id="pageTrades" class="page-view">
 
 <div class="toolbar">
-  <button class="btn" id="clearFilterBtn" onclick="clearAllFilters()" title="ล้าง filter ทั้งหมด" style="display:none;border-color:var(--gold-dim);color:var(--gold)">
-    <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5" viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
-    ล้าง Filter
-  </button>
+  <!-- Row 1: action buttons + search + date range -->
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%">
 
-  <div class="search-wrap">
-    <svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="9.5" y1="9.5" x2="14" y2="14"/></svg>
-    <input type="text" id="searchInput" placeholder="ค้นหาจาก Note…" oninput="onFilterChange()" />
-  </div>
+    <!-- ปุ่มเพิ่ม Trade -->
+    <button class="btn btn-primary" onclick="openAddModal()" style="gap:6px">
+      <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5" viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+      เพิ่ม Trade
+    </button>
 
-  <div style="display:flex;align-items:center;gap:6px">
-    <span style="font-size:12px;color:var(--muted);white-space:nowrap">Status:</span>
-    <select id="statusFilter" onchange="setStatusFilter(this.value || null)" style="padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;cursor:pointer">
-      <option value="">ทั้งหมด</option>
-      <option value="WIN">WIN</option>
-      <option value="LOSS">LOSS</option>
-      <option value="BE">BE</option>
-    </select>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:6px;position:relative">
-    <span style="font-size:12px;color:var(--muted);white-space:nowrap">Tag:</span>
-    <div id="tagFilterWrap" style="position:relative">
-      <button id="tagFilterBtn" onclick="toggleTagFilterDropdown()" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:var(--font-body);cursor:pointer;display:flex;align-items:center;gap:6px;min-width:100px;white-space:nowrap">
-        <span id="tagFilterLabel">ทั้งหมด</span>
-        <svg style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;margin-left:auto" viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg>
-      </button>
-      <div id="tagFilterDropdown" class="tag-filter-dropdown"></div>
+    <!-- Date range filter -->
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:12px;color:var(--muted);white-space:nowrap">วันที่:</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input type="date" id="dateFrom" onchange="onFilterChange()"
+          style="padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-family:var(--font-body);outline:none;cursor:pointer;width:132px" />
+        <span style="font-size:11px;color:var(--muted)">–</span>
+        <input type="date" id="dateTo" onchange="onFilterChange()"
+          style="padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-family:var(--font-body);outline:none;cursor:pointer;width:132px" />
+        <button id="clearDateBtn" onclick="clearDateFilter()" title="ล้างวันที่"
+          style="display:none;padding:5px 7px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);cursor:pointer;line-height:0">
+          <svg style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5" viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <button class="btn" onclick="removeAllTrades()" style="color:var(--red);border-color:var(--red);opacity:0.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">
-    <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 16 16"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2M5 5l.8 9h4.4L11 5"/></svg>
-    ลบทั้งหมด
-  </button>
+    <!-- Search note -->
+    <div class="search-wrap" style="flex:1;min-width:160px">
+      <svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="9.5" y1="9.5" x2="14" y2="14"/></svg>
+      <input type="text" id="searchInput" placeholder="ค้นหาจาก Note…" oninput="onFilterChange()" />
+    </div>
 
-  <div class="sync-indicator" id="syncIndicator">
-    <div class="sync-dot"></div>
-    <span id="syncText">กำลังโหลด…</span>
+    <!-- Status filter -->
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:12px;color:var(--muted);white-space:nowrap">Status:</span>
+      <select id="statusFilter" onchange="setStatusFilter(this.value || null)" style="padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;cursor:pointer">
+        <option value="">ทั้งหมด</option>
+        <option value="WIN">WIN</option>
+        <option value="LOSS">LOSS</option>
+        <option value="BE">BE</option>
+      </select>
+    </div>
+
+    <!-- Tag multi-select filter -->
+    <div style="display:flex;align-items:center;gap:6px;position:relative">
+      <span style="font-size:12px;color:var(--muted);white-space:nowrap">Tag:</span>
+      <div id="tagFilterWrap" style="position:relative">
+        <button id="tagFilterBtn" onclick="toggleTagFilterDropdown()" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:var(--font-body);cursor:pointer;display:flex;align-items:center;gap:6px;min-width:110px;white-space:nowrap">
+          <span id="tagFilterLabel">ทั้งหมด</span>
+          <svg style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;margin-left:auto" viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg>
+        </button>
+        <div id="tagFilterDropdown" class="tag-filter-dropdown"></div>
+      </div>
+    </div>
+
+    <!-- Clear filter -->
+    <button class="btn" id="clearFilterBtn" onclick="clearAllFilters()" title="ล้าง filter ทั้งหมด" style="display:none;border-color:var(--gold-dim);color:var(--gold)">
+      <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5" viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+      ล้าง Filter
+    </button>
+
+    <!-- Delete all -->
+    <button class="btn" onclick="removeAllTrades()" style="color:var(--red);border-color:var(--red);opacity:0.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">
+      <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 16 16"><polyline points="3,5 13,5"/><path d="M6 5V3h4v2M5 5l.8 9h4.4L11 5"/></svg>
+      ลบทั้งหมด
+    </button>
+
+    <div class="sync-indicator" id="syncIndicator">
+      <div class="sync-dot"></div>
+      <span id="syncText">กำลังโหลด…</span>
+    </div>
   </div>
 </div>
 
@@ -3039,6 +3082,11 @@ function setSourceStatus(status) {
 
 // ── Filter ──
 function onFilterChange() {
+  // show/hide clearDateBtn
+  const df = document.getElementById('dateFrom')?.value;
+  const dt = document.getElementById('dateTo')?.value;
+  const cb = document.getElementById('clearDateBtn');
+  if (cb) cb.style.display = (df || dt) ? 'flex' : 'none';
   updateClearBtn();
   renderCards();
   updateStats();
@@ -3046,13 +3094,25 @@ function onFilterChange() {
 
 function updateClearBtn() {
   const q = document.getElementById('searchInput').value;
-  const active = q || statusFilter || tagFilter.size > 0;
+  const dfVal = document.getElementById('dateFrom')?.value;
+  const dtVal = document.getElementById('dateTo')?.value;
+  const active = q || statusFilter || tagFilter.size > 0 || dfVal || dtVal;
   const btn = document.getElementById('clearFilterBtn');
   if (btn) btn.style.display = active ? 'inline-flex' : 'none';
 }
 
+function clearDateFilter() {
+  const df = document.getElementById('dateFrom');
+  const dt = document.getElementById('dateTo');
+  if (df) df.value = '';
+  if (dt) dt.value = '';
+  const cb = document.getElementById('clearDateBtn');
+  if (cb) cb.style.display = 'none';
+}
+
 function clearAllFilters() {
   document.getElementById('searchInput').value = '';
+  clearDateFilter();
   setStatusFilter(null);
   clearTagFilter();
   updateClearBtn();
@@ -3109,12 +3169,12 @@ function renderTagFilterDropdown() {
   if (!dd) return;
   const all = getAllUniqueTags();
   const allOpt = `<div class="tag-filter-opt${tagFilter.size === 0 ? ' active' : ''}" onclick="clearTagFilter()">
-    <span class="check">${tagFilter.size === 0 ? '✓' : ''}</span> ทั้งหมด
+    <span class="check">${tagFilter.size === 0 ? '✔' : ''}</span> ทั้งหมด
   </div>`;
   const opts = all.map(tag => {
     const sel = tagFilter.has(tag);
     return `<div class="tag-filter-opt${sel ? ' active' : ''}" onclick="toggleTagSelection('${tag.replace(/'/g,"\\'")}')">
-      <span class="check">${sel ? '✓' : ''}</span> ${tag}
+      <span class="check">${sel ? '✔' : ''}</span> ${tag}
     </div>`;
   }).join('');
   dd.innerHTML = allOpt + (all.length ? '<div style="height:1px;background:var(--border);margin:4px 0"></div>' + opts : '<div style="padding:6px 8px;font-size:11px;color:var(--muted)">ยังไม่มี tag</div>');
@@ -3222,7 +3282,16 @@ function getFilteredTrades() {
   return trades
     .filter(t => !q || (t.note || '').toLowerCase().includes(q))
     .filter(t => !statusFilter || t.status === statusFilter)
-    .filter(t => tagFilter.size === 0 || toTagArray(t.tags).some(tag => tagFilter.has(tag)));
+    .filter(t => tagFilter.size === 0 || [...tagFilter].every(tag => toTagArray(t.tags).includes(tag)))
+    .filter(t => {
+      const df = document.getElementById('dateFrom')?.value;
+      const dt = document.getElementById('dateTo')?.value;
+      if (!df && !dt) return true;
+      const td = t.tradeDate || '';
+      if (df && td < df) return false;
+      if (dt && td > dt) return false;
+      return true;
+    });
 }
 
 // comparator ตาม sortKey/sortDir ปัจจุบัน (ใช้ร่วมกันทั้งตารางและสถิติ con win/loss)
