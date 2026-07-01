@@ -3236,7 +3236,7 @@ function getFilteredTrades() {
   return trades
     .filter(t => !q || (t.note || '').toLowerCase().includes(q))
     .filter(t => !statusFilter || t.status === statusFilter)
-    .filter(t => !tagFilter || (Array.isArray(t.tags) && t.tags.includes(tagFilter)));
+    .filter(t => !tagFilter || toTagArray(t.tags).includes(tagFilter));
 }
 
 // comparator ตาม sortKey/sortDir ปัจจุบัน (ใช้ร่วมกันทั้งตารางและสถิติ con win/loss)
@@ -3497,8 +3497,8 @@ function renderCards() {
       <td style="font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:nowrap">${(t.entryTime ? (t.entryTime.includes(' - ') ? t.entryTime : (() => { const h = parseInt(t.entryTime); return isNaN(h) ? t.entryTime : `${String(h).padStart(2,'0')}:00 - ${String((h+1)%24).padStart(2,'0')}:00`; })()) : '—')}</td>
       <td>${t.session ? `<span class="session-badge sess-${t.session}">${{asia:'Asia',london:'London',ny:'New York',oos:'Out of Session'}[t.session]||t.session}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
       <td>
-        ${Array.isArray(t.tags) && t.tags.length
-          ? `<div class="tag-cell-pills">${t.tags.map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>`
+        ${toTagArray(t.tags).length
+          ? `<div class="tag-cell-pills">${toTagArray(t.tags).map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>`
           : '<span style="color:var(--muted)">—</span>'}
       </td>
       <td>${imgIconsHtml(t, 'before')}</td>
@@ -3606,7 +3606,7 @@ function handleTagInput(e) {
 
 function getAllUniqueTags() {
   const set = new Set();
-  trades.forEach(t => { if (Array.isArray(t.tags)) t.tags.forEach(tag => set.add(tag)); });
+  trades.forEach(t => { toTagArray(t.tags).forEach(tag => set.add(tag)); });
   return [...set].sort();
 }
 
@@ -3683,6 +3683,23 @@ function fmtDuration(val) {
   return parts.join(' ');
 }
 
+// Normalize tags from any storage format to a clean string array.
+// Google Sheets may return tags as: array, comma-separated string, or JSON-encoded string.
+function toTagArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.map(s => String(s).trim()).filter(Boolean);
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    // Try JSON parse first (e.g. '["BOS","MSS"]')
+    if (trimmed.startsWith('[')) {
+      try { const p = JSON.parse(trimmed); if (Array.isArray(p)) return p.map(s => String(s).trim()).filter(Boolean); } catch(e) {}
+    }
+    // Fall back to comma-separated (e.g. "BOS,MSS")
+    return trimmed.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 function toImgArray(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val.filter(Boolean);
@@ -3707,7 +3724,7 @@ function editTrade(id) {
   }
   document.getElementById('inputRR').value = (t.rr !== undefined && t.rr !== '') ? t.rr : '';
   updateRRPrefix();
-  curTags = Array.isArray(t.tags) ? [...t.tags] : [];
+  curTags = toTagArray(t.tags);
   renderTagPills();
   if (document.getElementById('tagTextInput')) document.getElementById('tagTextInput').value = '';
   document.querySelectorAll('input[name="tradeStatus"]').forEach(r => { r.checked = r.value === (t.status || ''); });
@@ -3794,8 +3811,8 @@ function openTradeDetail(id) {
     <!-- Tags -->
     <div>
       <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Set Up / Tags</div>
-      ${Array.isArray(t.tags) && t.tags.length
-        ? `<div class="tag-cell-pills">${t.tags.map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>`
+      ${toTagArray(t.tags).length
+        ? `<div class="tag-cell-pills">${toTagArray(t.tags).map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>`
         : '<span style="color:var(--muted);font-size:13px">—</span>'}
     </div>
 
@@ -4062,6 +4079,30 @@ function getActiveScrollEl() {
   return null; // null = use window scroll
 }
 
+function switchSetupTab(tab) {
+  const panelSingle = document.getElementById('setupPanelSingle');
+  const panelCombo  = document.getElementById('setupPanelCombo');
+  const btnSingle   = document.getElementById('setupTabSingle');
+  const btnCombo    = document.getElementById('setupTabCombo');
+  const badge       = document.getElementById('setupCardBadge');
+  const title       = document.getElementById('setupCardTitle');
+
+  const activeStyle   = 'background:var(--gold);color:#000';
+  const inactiveStyle = 'background:transparent;color:var(--muted)';
+
+  if (tab === 'single') {
+    if (panelSingle) panelSingle.style.display = '';
+    if (panelCombo)  panelCombo.style.display  = 'none';
+    if (btnSingle)   btnSingle.style.cssText   = `padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;${activeStyle};transition:background .15s,color .15s`;
+    if (btnCombo)    btnCombo.style.cssText     = `padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;${inactiveStyle};transition:background .15s,color .15s`;
+  } else {
+    if (panelSingle) panelSingle.style.display = 'none';
+    if (panelCombo)  panelCombo.style.display  = '';
+    if (btnSingle)   btnSingle.style.cssText   = `padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;${inactiveStyle};transition:background .15s,color .15s`;
+    if (btnCombo)    btnCombo.style.cssText     = `padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;${activeStyle};transition:background .15s,color .15s`;
+  }
+}
+
 function scrollToTopFab() {
   const scEl = getActiveScrollEl();
   if (scEl) {
@@ -4164,7 +4205,7 @@ function renderGalleryGroup(containerId, statusVal) {
       </div>
       <div class="gallery-card-body">
         ${t.rr !== undefined && t.rr !== '' ? `<span class="gallery-card-rr" style="color:${parseFloat(t.rr) >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtRR(t.rr)}</span>` : ''}
-        ${Array.isArray(t.tags) && t.tags.length ? `<div class="tag-cell-pills">${t.tags.map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>` : ''}
+        ${toTagArray(t.tags).length ? `<div class="tag-cell-pills">${toTagArray(t.tags).map(tag => `<span class="tag-cell-pill">${tag}</span>`).join('')}</div>` : ''}
         ${t.duration !== undefined && t.duration !== '' ? `<span class="gallery-card-duration">⏱ ${fmtDuration(t.duration)}</span>` : ''}
       </div>
     </div>
@@ -4472,7 +4513,7 @@ function renderStats() {
   // ── By Tag ──
   const tagMap = {};
   t.forEach(x => {
-    (Array.isArray(x.tags) ? x.tags : []).forEach(tag => {
+    toTagArray(x.tags).forEach(tag => {
       if (!tagMap[tag]) tagMap[tag] = { w:0, l:0, be:0, rrs:[] };
       if (x.status==='WIN') tagMap[tag].w++;
       else if (x.status==='LOSS') tagMap[tag].l++;
@@ -4481,12 +4522,38 @@ function renderStats() {
       if (!isNaN(r)) tagMap[tag].rrs.push(r);
     });
   });
+  // Debug: log tagMap to console so user can verify
+  console.log('[Stats] tagMap:', JSON.stringify(Object.keys(tagMap)));
+  console.log('[Stats] sample tags:', t.slice(0,5).map(x => x.tags));
+
   const tagRows = Object.entries(tagMap).map(([tag, v]) => {
     const d = v.w + v.l;
     const wr = d > 0 ? v.w/d*100 : 0;
     const trr = v.rrs.reduce((a,b)=>a+b,0);
     const avg = v.rrs.length ? trr/v.rrs.length : 0;
     return { tag, total: v.w+v.l+v.be, w:v.w, l:v.l, wr, trr, avg };
+  }).sort((a,b) => b.total - a.total);
+
+  // ── By Tag Combo (trades with 2+ tags) ──
+  const comboMap = {};
+  t.forEach(x => {
+    const tags = toTagArray(x.tags);
+    if (tags.length < 2) return;
+    // Sort tags so "OB+FOLLOW" and "FOLLOW+OB" map to same key
+    const key = [...tags].sort().join(' + ');
+    if (!comboMap[key]) comboMap[key] = { w:0, l:0, be:0, rrs:[] };
+    if (x.status==='WIN') comboMap[key].w++;
+    else if (x.status==='LOSS') comboMap[key].l++;
+    else comboMap[key].be++;
+    const r = parseFloat(x.rr);
+    if (!isNaN(r)) comboMap[key].rrs.push(r);
+  });
+  const comboRows = Object.entries(comboMap).map(([key, v]) => {
+    const d = v.w + v.l;
+    const wr = d > 0 ? v.w/d*100 : 0;
+    const trr = v.rrs.reduce((a,b)=>a+b,0);
+    const avg = v.rrs.length ? trr/v.rrs.length : 0;
+    return { key, total: v.w+v.l+v.be, w:v.w, l:v.l, wr, trr, avg };
   }).sort((a,b) => b.total - a.total);
 
   // ── RR Distribution buckets (neg: 1R range, pos: 5R range) ──
@@ -4979,12 +5046,59 @@ function renderStats() {
     </div>
   </div>
 
-  <!-- Tags -->
+  <!-- Tags + Combos (merged with toggle) -->
   ${tagRows.length ? `<div>
     <div class="stat-section-title">Performance by SET UP</div>
     <div class="chart-card">
-      <div class="chart-card-title">SET UP Breakdown <span class="badge">${tagRows.length} set ups</span></div>
-      ${tagTable()}
+      <!-- Toggle header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="chart-card-title" style="margin-bottom:0" id="setupCardTitle">SET UP Breakdown <span class="badge" id="setupCardBadge">${tagRows.length} set ups</span></div>
+        <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px">
+          <button id="setupTabSingle" onclick="switchSetupTab('single')"
+            style="padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;background:var(--gold);color:#000;transition:background .15s,color .15s">
+            Single Tag
+          </button>
+          ${comboRows.length ? `<button id="setupTabCombo" onclick="switchSetupTab('combo')"
+            style="padding:4px 12px;border-radius:calc(var(--radius-sm) - 2px);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:background .15s,color .15s">
+            Combo <span style="opacity:.6">(${comboRows.length})</span>
+          </button>` : ''}
+        </div>
+      </div>
+
+      <!-- Single tag table -->
+      <div id="setupPanelSingle">
+        ${tagTable()}
+      </div>
+
+      <!-- Combo table (hidden by default) -->
+      ${comboRows.length ? `<div id="setupPanelCombo" style="display:none">
+        <div class="tag-stat-table-wrap"><table class="tag-stat-table">
+          <thead><tr>
+            <th>SET UP COMBO</th><th>Trades</th><th>W</th><th>L</th><th>WR%</th><th>Total RR</th><th>Avg RR</th>
+          </tr></thead>
+          <tbody>${(() => {
+            const maxAbsRR = Math.max(...comboRows.map(x=>Math.abs(x.trr)), 0.01);
+            return comboRows.map(r => {
+              const barW = Math.abs(r.trr)/maxAbsRR*100;
+              const bCol = r.trr>=0?'var(--green)':'var(--red)';
+              return `<tr>
+                <td><span class="tag-pill-sm">${r.key}</span></td>
+                <td>${r.total}</td>
+                <td style="color:var(--green)">${r.w}</td>
+                <td style="color:var(--red)">${r.l}</td>
+                <td style="color:${r.wr>=50?'var(--green)':'var(--red)'}">${Math.round(r.wr)}%</td>
+                <td>
+                  <div class="rr-bar-wrap">
+                    <div class="rr-bar-track"><div class="rr-bar-fill" style="width:${barW}%;background:${bCol}"></div></div>
+                    <span style="color:${bCol}">${fmt(r.trr)}</span>
+                  </div>
+                </td>
+                <td style="color:${r.avg>=0?'var(--green)':'var(--red)'}">${fmt(r.avg)}</td>
+              </tr>`;
+            }).join('');
+          })()}</tbody>
+        </table></div>
+      </div>` : ''}
     </div>
   </div>` : ''}
 
@@ -6419,7 +6533,7 @@ function calShowDay(dateStr) {
         <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${rrColor};min-width:56px">${rrStr}</span>
         ${tr.entryTime ? `<span style="font-size:11px;color:var(--muted)">${tr.entryTime}</span>` : ''}
         ${tr.session ? `<span style="font-size:10px;background:var(--surface2);padding:2px 8px;border-radius:10px;color:var(--muted)">${tr.session}</span>` : ''}
-        ${(tr.tags||[]).slice(0,2).map(tag=>`<span style="font-size:10px;background:rgba(201,168,76,0.12);color:var(--gold);padding:2px 8px;border-radius:10px">${tag}</span>`).join('')}
+        ${toTagArray(tr.tags).slice(0,2).map(tag=>`<span style="font-size:10px;background:rgba(201,168,76,0.12);color:var(--gold);padding:2px 8px;border-radius:10px">${tag}</span>`).join('')}
         <button onclick="goToTrade('${tr.id}')" style="margin-left:auto;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);padding:3px 10px;font-size:11px;cursor:pointer">→ View</button>
       </div>`;
   }).join('');
