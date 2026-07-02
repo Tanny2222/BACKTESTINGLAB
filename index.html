@@ -4980,12 +4980,12 @@ function renderStats() {
       const y = pad.t + ch - bh;
       const mid = (d.min + d.max) / 2;
       const isMode = modeMinSet.has(d.min);
-      const col = isMode ? '#F5D04A' : (mid >= 0 ? 'var(--green)' : 'var(--red)');
+      const col = isMode ? '#E8943A' : (mid >= 0 ? 'var(--green)' : 'var(--red)');
       bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="3" fill="${col}" opacity="${isMode?'1':'0.8'}"/>`;
-      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="${isMode?'#F5D04A':'var(--muted)'}" font-weight="${isMode?'700':'400'}">${d.count}</text>`;
-      if (isMode) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#F5D04A">MODE</text>`;
+      if (d.count > 0) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="${isMode?'#E8943A':'var(--muted)'}" font-weight="${isMode?'700':'400'}">${d.count}</text>`;
+      if (isMode) bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(y-14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#E8943A">MODE</text>`;
       const shortLabel = (d.min >= 0 ? '+' : '') + d.min;
-      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="${isMode?'#F5D04A':'var(--muted)'}">${shortLabel}</text>`;
+      bars += `<text x="${(x+bw/2).toFixed(1)}" y="${(pad.t+ch+14).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="${isMode?'#E8943A':'var(--muted)'}">${shortLabel}</text>`;
     });
     const zeroIdx = distData.findIndex(d => d.min === 0);
     let zeroLine = '';
@@ -5138,18 +5138,18 @@ function renderStats() {
   <div>
     <div class="stat-section-title">RR Breakdown</div>
     <div class="kpi-grid">
-      <div class="kpi-card" style="--kpi-accent:#F6E05E">
-        <div class="kpi-val" style="color:#F6E05E">${fmt(maxRR)}</div>
+      <div class="kpi-card" style="--kpi-accent:#E8943A">
+        <div class="kpi-val" style="color:#E8943A">${fmt(maxRR)}</div>
         <div class="kpi-label">Best Trade</div>
         <div class="kpi-sub">Max RR</div>
       </div>
-      <div class="kpi-card" style="--kpi-accent:#F6E05E">
-        <div class="kpi-val" style="color:#F6E05E">${rrWin.length?fmt(minWinRR):'—'}</div>
+      <div class="kpi-card" style="--kpi-accent:#E8943A">
+        <div class="kpi-val" style="color:#E8943A">${rrWin.length?fmt(minWinRR):'—'}</div>
         <div class="kpi-label">Min WIN RR</div>
         <div class="kpi-sub">from ${rrWin.length} wins</div>
       </div>
-      <div class="kpi-card" style="--kpi-accent:#F6E05E">
-        <div class="kpi-val" style="color:#F6E05E">${rrWin.length?fmt(avgWin):'—'}</div>
+      <div class="kpi-card" style="--kpi-accent:#E8943A">
+        <div class="kpi-val" style="color:#E8943A">${rrWin.length?fmt(avgWin):'—'}</div>
         <div class="kpi-label">Avg WIN RR</div>
         <div class="kpi-sub">from ${rrWin.length} wins</div>
       </div>
